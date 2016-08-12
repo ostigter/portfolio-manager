@@ -293,7 +293,7 @@ public class EditStockDialog extends Dialog {
             showError("Please select the stock's credit rating.");
             return;
         }
-        String targetPriceText = targetPriceField.getText().trim();
+        String targetPriceText = targetPriceField.getText().trim().replace(',', '.');
         double targetPrice = 0.0;
         if (targetPriceText.length() > 0) {
             try {

@@ -99,6 +99,8 @@ public class OwnedTable extends DataTable {
      * Initializes the table columns.
      */
     protected void initColumns() {
+        boolean roundTotals = Configuration.getInstance().isRoundTotals();
+
         ColumnRenderer numberColumnRenderer = new DefaultColumnRenderer(SwingConstants.RIGHT);
         ColumnRenderer centeredColumnRenderer = new DefaultColumnRenderer(SwingConstants.CENTER);
         ColumnRenderer percChangeColumnRenderer = new PercChangeColumnRenderer();
@@ -107,8 +109,8 @@ public class OwnedTable extends DataTable {
         ColumnRenderer yearsColumnRenderer = new YDGColumnRenderer();
         ColumnRenderer ratingColumnRenderer = new CRColumnRenderer();
         ColumnRenderer smallMoneyColumnRenderer = new MoneyColumnRenderer(2);
-        ColumnRenderer bigMoneyColumnRenderer = new MoneyColumnRenderer(0);
-        ColumnRenderer resultColumnRenderer = new ResultColumnRenderer(0);
+        ColumnRenderer totalMoneyColumnRenderer = new MoneyColumnRenderer(roundTotals ? 0 : 2);
+        ColumnRenderer resultColumnRenderer = new ResultColumnRenderer(roundTotals ? 0 : 2);
         ColumnRenderer percColumnRenderer = new PercentageColumnRenderer();
 
         List<Column> columns = new ArrayList<Column>();
@@ -121,13 +123,13 @@ public class OwnedTable extends DataTable {
         columns.add(new Column("YDG", "Consecutive years of dividend growth", yearsColumnRenderer));
         columns.add(new Column("CR", "Current credit rating", ratingColumnRenderer));
         columns.add(new Column("Shares", "Current number of shares owned", numberColumnRenderer));
-        columns.add(new Column("Cost", "Current cost basis", bigMoneyColumnRenderer));
+        columns.add(new Column("Cost", "Current cost basis", totalMoneyColumnRenderer));
         columns.add(new Column("CPS", "Current cost basis per share", smallMoneyColumnRenderer));
-        columns.add(new Column("Value", "Current market value", bigMoneyColumnRenderer));
+        columns.add(new Column("Value", "Current market value", totalMoneyColumnRenderer));
         columns.add(new Column("Weight", "Relative weight in portfolio based on cost", percColumnRenderer));
         columns.add(new Column("Result", "Current result (value minus cost)", resultColumnRenderer));
         columns.add(new Column("Result %", "Current result as percentage of cost", percChangeColumnRenderer));
-        columns.add(new Column("AI", "Annual income based on current yield", bigMoneyColumnRenderer));
+        columns.add(new Column("AI", "Annual income based on current yield", totalMoneyColumnRenderer));
         columns.add(new Column("YOC", "Annual yield on cost", percColumnRenderer));
         columns.add(new Column("TI", "Overall total income received", resultColumnRenderer));
         columns.add(new Column("RR", "Total realized result from sales", resultColumnRenderer));

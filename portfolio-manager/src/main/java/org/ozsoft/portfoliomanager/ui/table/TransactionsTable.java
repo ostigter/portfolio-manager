@@ -90,12 +90,15 @@ public class TransactionsTable extends DataTable {
      * Initializes the table columns
      */
     protected void initColumns() {
+        boolean roundTotals = Configuration.getInstance().isRoundTotals();
+
         ColumnRenderer idColumnRenderer = new DefaultColumnRenderer(SwingConstants.RIGHT);
         ColumnRenderer centerColumnRenderer = new DefaultColumnRenderer(SwingConstants.CENTER);
         ColumnRenderer dateColumnRenderer = new DateColumnRenderer();
         ColumnRenderer sharesColumnRenderer = new SharesColumnRenderer();
-        ColumnRenderer moneyColumnRenderer = new MoneyColumnRenderer(2);
         ColumnRenderer priceColumnRenderer = new MoneyColumnRenderer(4);
+        ColumnRenderer costColumnRenderer = new MoneyColumnRenderer(2);
+        ColumnRenderer totalColumnRenderer = new MoneyColumnRenderer(roundTotals ? 0 : 2);
 
         List<Column> columns = new ArrayList<Column>();
         columns.add(new Column("ID", "Transaction ID", idColumnRenderer));
@@ -105,8 +108,8 @@ public class TransactionsTable extends DataTable {
         columns.add(new Column("Type", "Transaction type", centerColumnRenderer));
         columns.add(new Column("Shares", "Number of shares", sharesColumnRenderer));
         columns.add(new Column("Price", "Price per share", priceColumnRenderer));
-        columns.add(new Column("Costs", "Transaction costs, incl. broker fees, valuta costs, etc.", moneyColumnRenderer));
-        columns.add(new Column("Total", "Total transaction value", moneyColumnRenderer));
+        columns.add(new Column("Costs", "Transaction costs, incl. broker fees, valuta costs, etc.", costColumnRenderer));
+        columns.add(new Column("Total", "Total transaction value", totalColumnRenderer));
         setColumns(columns);
     }
 

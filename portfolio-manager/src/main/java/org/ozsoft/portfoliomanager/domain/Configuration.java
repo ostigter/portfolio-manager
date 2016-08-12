@@ -64,6 +64,8 @@ public class Configuration {
 
     private static Configuration config;
 
+    private boolean roundTotals = true;
+
     private boolean showClosedPositions = false;
 
     private boolean deductIncomeTax = false;
@@ -258,6 +260,25 @@ public class Configuration {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns whether to round monetary totals values (do not display cents).
+     * 
+     * @return whether to round monetary totals
+     */
+    public boolean isRoundTotals() {
+        return roundTotals;
+    }
+
+    /**
+     * Sets whether to round monetary totals values (do not display cents).
+     * 
+     * @param roundTotals
+     *            {@code true} if values should be rounded, otherwise {@code false}.
+     */
+    public void setRoundTotals(boolean roundTotals) {
+        this.roundTotals = roundTotals;
     }
 
     /**

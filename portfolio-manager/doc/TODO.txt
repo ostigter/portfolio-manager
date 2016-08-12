@@ -1,11 +1,9 @@
 Portfolio Manager - TODO
 ========================
 
-* Promote to own GitHub project
-* Support both dot and comma as decimal separators
-* Configuration option to enable/disable rounding off monetary values
 * Show portfolio results (costbase, income, total return, per month, quarter and year)
 * Show stock performance (total return over 1, 3, 5 and 10 year)
+* Use BigDecimal instead of double for monetary values (rounding errors)
 * Configuration dialog
 * Alert log
 * View alerts (since last update)

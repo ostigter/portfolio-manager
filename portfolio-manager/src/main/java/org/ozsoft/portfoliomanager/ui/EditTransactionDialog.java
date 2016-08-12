@@ -411,18 +411,18 @@ public class EditTransactionDialog extends Dialog {
 
         double price = -1.0;
         try {
-            price = Double.parseDouble(priceText.getText());
+            price = Double.parseDouble(priceText.getText().trim().replace(',', '.'));
         } catch (NumberFormatException e) {
             // Handled by range check below.
         }
         if (price < 0.01) {
-            JOptionPane.showMessageDialog(null, "Invalid price (must be greater than $0.01).", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Invalid price (must be greater than $0.00).", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         double cost = 0.0;
         try {
-            cost = Double.parseDouble(costsText.getText());
+            cost = Double.parseDouble(costsText.getText().trim().replace(',', '.'));
         } catch (NumberFormatException e) {
             // Handled by range check below.
         }
