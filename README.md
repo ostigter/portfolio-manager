@@ -1,4 +1,4 @@
-# portfolio-manager
+# Portfolio Manager (portfolio-manager)
 
 ## Introduction
 
