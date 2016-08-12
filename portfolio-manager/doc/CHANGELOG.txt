@@ -1,0 +1,11 @@
+CHANGELOG
+=========
+
+Release     Date            Description
+---------------------------------------------------------------------------------------------------
+
+0.1         ?               First release!
+
+-           12-Aug-2016     Migrated to own GitHub project
+
+-           12-Nov-2015     Project started (incubator)
