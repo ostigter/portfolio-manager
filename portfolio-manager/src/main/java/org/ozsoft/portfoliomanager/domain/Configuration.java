@@ -207,7 +207,7 @@ public class Configuration {
             transaction.setId(id++);
         }
 
-        return transactions;
+        return Collections.unmodifiableList(transactions);
     }
 
     /**

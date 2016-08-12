@@ -19,7 +19,9 @@
 package org.ozsoft.portfoliomanager.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -70,7 +72,11 @@ public class TransactionsFrame extends JDialog {
 
         transactionsTable.update();
 
-        setSize(800, 600);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int width = (int) (0.6 * screenSize.getWidth());
+        int height = (int) (0.85 * screenSize.getHeight());
+        setSize(width, height);
+        setResizable(false);
         setLocationRelativeTo(mainFrame);
     }
 

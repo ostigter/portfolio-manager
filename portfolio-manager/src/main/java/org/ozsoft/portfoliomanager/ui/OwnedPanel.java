@@ -72,6 +72,7 @@ public class OwnedPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
 
         JButton button = new JButton("Update");
+        button.setToolTipText("Update the currently visible stocks in the portfolio");
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -81,6 +82,7 @@ public class OwnedPanel extends JPanel {
         buttonPanel.add(button);
 
         button = new JButton("Transactions");
+        button.setToolTipText("View or edit the portfolio transactions");
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -89,7 +91,18 @@ public class OwnedPanel extends JPanel {
         });
         buttonPanel.add(button);
 
+        button = new JButton("Statistics");
+        button.setToolTipText("Shows portfolio statistics like costbase, income and total return over time");
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new StatisticsFrame(mainFrame);
+            }
+        });
+        buttonPanel.add(button);
+
         showClosedPositionsCheck = new JCheckBox("Show closed positions");
+        showClosedPositionsCheck.setToolTipText("Toggles showing only open positions or also the closed positions");
         showClosedPositionsCheck.setSelected(config.getShowClosedPositions());
         showClosedPositionsCheck.addActionListener(new ActionListener() {
             @Override
@@ -100,6 +113,7 @@ public class OwnedPanel extends JPanel {
         buttonPanel.add(showClosedPositionsCheck);
 
         deductIncomeTaxCheck = new JCheckBox("Deduct dividend tax");
+        deductIncomeTaxCheck.setToolTipText("Toggles the automatic deduction of the dividend tax (view only)");
         deductIncomeTaxCheck.setSelected(config.isDeductIncomeTax());
         deductIncomeTaxCheck.addActionListener(new ActionListener() {
             @Override
