@@ -38,8 +38,15 @@ import org.apache.commons.io.IOUtils;
  */
 public class HttpPageReader {
 
-    private static final int CONNECT_TIMEOUT = 5000; // 5 sec.
-    private static final int READ_TIMEOUT = 300000; // 5 min.
+    /** User-Agent spoofing as Android phone for minimum page size (maximum performance). */
+    private static final String USER_AGENT = "Mozilla/5.0 (Linux; U; Android 5.1; en-us; Nexus One Build/FRG83) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1";
+
+    /** HTTP connect timeout in milliseconds. */
+    private static final int CONNECT_TIMEOUT = 10000; // 10 seconds
+
+    /** HTTP read timeout in milliseconds. */
+    private static final int READ_TIMEOUT = 60000; // 1 minute
+
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy", Locale.US);
 
     private boolean useProxy = false;
@@ -80,6 +87,7 @@ public class HttpPageReader {
         updateProxySettings();
         URL url = new URL(uri);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("User-Agent", USER_AGENT);
         connection.setConnectTimeout(CONNECT_TIMEOUT);
         connection.setReadTimeout(READ_TIMEOUT);
         return IOUtils.toString(connection.getInputStream());

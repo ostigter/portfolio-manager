@@ -26,18 +26,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ozsoft.portfoliomanager.domain.Exchange;
 import org.ozsoft.portfoliomanager.domain.Stock;
+import org.ozsoft.portfoliomanager.services.downloader.MarketWatchQuoteDownloader;
+import org.ozsoft.portfoliomanager.services.downloader.QuoteDownloader;
 import org.ozsoft.portfoliomanager.util.HttpPageReader;
 
 /**
- * Thread that updates the share price of a single stock. <br />
+ * Thread that updates a single stock. <br />
  * <br />
- * Gets the latest (delayed) share price from the Yahoo! Finance API and Morningstar's value rating.
+ * 
+ * Gets the current stock quote from the MarketWatch and Morningstar's value rating.
  * 
  * @author Oscar Stigter
  */
 public class StockUpdater extends Thread {
-
-    private static final String YAHOO_STOCK_QUOTE_URI = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1p2rd";
 
     private static final String MORNINGSTAR_QUOTE_URI = "http://www.morningstar.com/stocks/%s/%s/quote.html";
 
@@ -48,6 +49,8 @@ public class StockUpdater extends Thread {
     private final Stock stock;
 
     private final HttpPageReader httpPageReader;
+
+    private final QuoteDownloader downloader;
 
     private boolean isFinished = false;
 
@@ -64,6 +67,10 @@ public class StockUpdater extends Thread {
     public StockUpdater(Stock stock, HttpPageReader httpPageReader) {
         this.stock = stock;
         this.httpPageReader = httpPageReader;
+
+        // TODO: Automatic failover to other quote downloaders.
+        downloader = new MarketWatchQuoteDownloader(httpPageReader);
+        // downloader = new YahooFinanceQuoteDownloader(httpPageReader);
     }
 
     /**
@@ -86,31 +93,11 @@ public class StockUpdater extends Thread {
 
     @Override
     public void run() {
-        try {
-            // Get stock quote from Yahoo Finance API
-            // LOGGER.debug("Requesting stock quote for " + stock);
-            String line = httpPageReader.read(String.format(YAHOO_STOCK_QUOTE_URI, stock.getSymbol())).trim();
-            // LOGGER.debug(String.format("CSV line for '%s': '%s'", stock, line));
-            String[] fields = line.split(",");
-            if (fields.length == 4) {
-                try {
-                    double price = Double.parseDouble(fields[0]);
-                    if (price != stock.getPrice()) {
-                        stock.setPrice(price);
-                        stock.setChangePerc(fields[2].equals("N/A") ? 0.0 : Double.parseDouble(fields[1].replaceAll("[\"%]", "")));
-                        stock.setPeRatio(fields[2].equals("N/A") ? -1.0 : Double.parseDouble(fields[2]));
-                        stock.setDivRate(fields[3].equals("N/A") ? 0.0 : Double.parseDouble(fields[3]));
-                        isUpdated = true;
-                        // LOGGER.debug(String.format("Updated stock price of '%s'", stock));
-                    }
-                } catch (NumberFormatException e) {
-                    LOGGER.error(String.format("Could not parse stock quote for %s: '%s'", stock, line), e);
-                }
-            } else {
-                LOGGER.error(String.format("Invalid number of CSV fields returned for %s: '%s'", stock, line));
-            }
+        // Get stock quote.
+        isUpdated = downloader.updateStock(stock);
 
-            // Get Morningstar value rating (if rated).
+        // Get Morningstar value rating (if rated).
+        try {
             int starRating = -1;
             String exchangeId = (stock.getExchange() == Exchange.NYSE) ? "xnys" : "xnas";
             String content = httpPageReader.read(String.format(MORNINGSTAR_QUOTE_URI, exchangeId, stock.getSymbol()));
@@ -119,9 +106,8 @@ public class StockUpdater extends Thread {
                 starRating = Integer.parseInt(m.group(1));
             }
             stock.setStarRating(starRating);
-
         } catch (IOException e) {
-            LOGGER.error("Failed to retrieve full stock quote for " + stock, e);
+            LOGGER.error(String.format("Failed to retrieve Morningstar value rating for %s: %s", stock, e.getMessage()));
         }
 
         isFinished = true;

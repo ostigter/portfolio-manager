@@ -70,6 +70,8 @@ public class UpdateService {
 
     private static final int YEARS_GROWTH_COLUMN_INDEX = CellReference.convertColStringToIndex("D");
 
+    private static final int DIV_RATE_COLUMN_INDEX = CellReference.convertColStringToIndex("R");
+
     private static final int DIV_GROWTH_COLUMN_INDEX = CellReference.convertColStringToIndex("AN");
 
     private static final String HISTORICAL_CLOSINGS_URL = "http://ichart.finance.yahoo.com/table.csv?s=%s";
@@ -205,13 +207,15 @@ public class UpdateService {
                         if (cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING) {
                             String symbol = cell.getStringCellValue();
                             int yearsDivGrowth = (int) Math.floor(row.getCell(YEARS_GROWTH_COLUMN_INDEX).getNumericCellValue());
+                            double divRate = row.getCell(DIV_RATE_COLUMN_INDEX).getNumericCellValue();
                             cell = row.getCell(DIV_GROWTH_COLUMN_INDEX);
                             double divGrowth = (cell != null && cell.getCellType() == Cell.CELL_TYPE_NUMERIC) ? cell.getNumericCellValue() : -1.0;
 
                             Stock stock = config.getStock(symbol);
                             if (stock != null) {
-                                stock.setDivGrowth(divGrowth);
                                 stock.setYearsDivGrowth(yearsDivGrowth);
+                                stock.setDivRate(divRate);
+                                stock.setDivGrowth(divGrowth);
                                 count++;
                             }
                         }

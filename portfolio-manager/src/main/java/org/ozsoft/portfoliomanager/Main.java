@@ -37,6 +37,8 @@ public class Main {
                 LOGGER.info("Application started");
             }
         });
-        // Configuration.getInstance().getPortfolio().printResults();
+
+        // Stock stock = Configuration.getInstance().getStock("MSFT");
+        // new MarketWatchQuoteDownloader(new HttpPageReader()).updateStock(stock);
     }
 }
