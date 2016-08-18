@@ -13,7 +13,7 @@ retrieved from Morningstar and David Fish' CCC list.
 Portfolio Manager is implemented in Java SE with a Swing GUI and has a Maven project structure.
 
 The open source project is archived on GitHub:
-http://www.github.org/ostigter/portfolio-manager/
+https://github.com/ostigter/portfolio-manager/
 
 ## License
 
