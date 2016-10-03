@@ -1,12 +1,16 @@
 Portfolio Manager - TODO
 ========================
 
-* Correctly handle price change percentage outside market hours
-* Show stock performance (total return over 1, 3, 5 and 10 year)
+* Correct total return CAGR calculation  
 * Use BigDecimal instead of double for monetary values (rounding errors)
+* Show stock performance (total return over 1, 3, 5 and 10 year)
+* Daily portfolio backup
+* Portfolio result graphs
+* Correctly handle price change percentage outside market hours
+* View application log
 * Configuration dialog
 * Alert log
-* View alerts (since last update)
+* View alerts (since last day)
 * Task progress indicator
 * Extend stock analysis score formula (CR, YDG, CY, DGR)
 * View stock analysis details per share
@@ -14,4 +18,3 @@ Portfolio Manager - TODO
 * View income overview ('Income' tab)
 * Set/view sector and industry per stock
 * View portfolio diversification (per sector/stock)
-* Daily portfolio backup
