@@ -165,7 +165,8 @@ public class StatisticsFrame extends JDialog {
                         if (cps != null && sps != null && sps > 0) {
                             avgPrice = cps / sps;
                         } else {
-                            throw new IllegalStateException(String.format("Invalid SELL transaction for stock '%s': non-existing position", symbol));
+                            throw new IllegalStateException(String.format("Invalid SELL transaction for stock '%s': non-existing position",
+                                    symbol));
                         }
                         costs = tx.getNoOfShares() * avgPrice;
                         dayCosts = costPerDay.get(daysInMonth);
@@ -222,7 +223,8 @@ public class StatisticsFrame extends JDialog {
         }
 
         textArea.append(
-                String.format("%s, %d:\t\tAverage Costbase: $%,.0f, Income: $%,.0f\n", MONTHS[month], year, currentCost, monthlyResult.getIncome()));
+                String.format("%s, %d:\t\tAverage Costbase: $%,.0f, Income: $%,.0f\n", MONTHS[month], year, currentCost, monthlyResult
+                        .getIncome()));
         textArea.append(String.format("\nQuarter %d, %d:\tAverage Costbase: $%,.0f, Income: $%,.0f\n", quarter, year, currentCost,
                 quarterlyResult.getIncome()));
         textArea.append(String.format("\n%d:\t\t\tAverage Costbase: $%,.0f, Income: $%,.0f\n", year, currentCost, annualResult.getIncome()));
@@ -232,22 +234,26 @@ public class StatisticsFrame extends JDialog {
             // textArea.append(String.format("Day %04d:\t\tCostbase: $%,.0f\n", dayNr, overallCosts.get(dayNr)));
             sum += overallCosts.get(dayNr);
         }
+        double years = totalDays / 365.0;
+        if (years < 1.0) {
+            years = 1.0; // to not extrapolate CAGR for less than a year
+        }
         double avgCost = sum / totalDays;
         Portfolio portfolio = config.getPortfolio();
         double totalReturn = portfolio.getTotalReturn();
-        double totalReturnPerc = totalReturn / avgCost * 100.0;
-        textArea.append(String.format("\nOverall:\t\tAverage Costbase: $%,.0f, Income: $%,.0f, Total Return: $%,.0f (%.2f %%)\n", avgCost,
-                portfolio.getTotalIncome(), totalReturn, totalReturnPerc));
+        double totalReturnCAGR = (Math.pow(totalReturn / avgCost + 1.0, 1.0 / years) - 1.0) * 100.0;
+        textArea.append(String.format("\nOverall:\t\tAverage Costbase: $%,.0f, Income: $%,.0f, Total Return: $%,.0f (%.2f %% CAGR)\n",
+                avgCost, portfolio.getTotalIncome(), totalReturn, totalReturnCAGR));
     }
 
     /**
      * Returns the next transaction on a specific day, or {@code null} if not found.
-     * 
+     *
      * @param transactions
      *            The transactions (must be sorted by date).
      * @param day
      *            The day.
-     * 
+     *
      * @return The transaction if found, otherwise {@code null}.
      */
     private static Transaction getTransactionOnDay(List<Transaction> transactions, Calendar day) {
@@ -261,10 +267,10 @@ public class StatisticsFrame extends JDialog {
 
     /**
      * Returns the {@code Calendar} object of a timestamp, rounded to midnight that day (00:00).
-     * 
+     *
      * @param timestamp
      *            The date as a timestamp in milliseconds.
-     * 
+     *
      * @return The {@code Calendar} object.
      */
     private static Calendar getDay(long timestamp) {
