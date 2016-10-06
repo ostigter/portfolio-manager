@@ -30,9 +30,9 @@ import org.ozsoft.portfoliomanager.util.HttpPageReader;
 /**
  * Stock quote downloader using web scraping from MarketWatch (real-time). <br />
  * <br />
- * 
+ *
  * Updates the stock's last price, price change percentage and P/E ratio.
- * 
+ *
  * @author Oscar Stigter
  */
 public class MarketWatchQuoteDownloader extends QuoteDownloader {
@@ -48,7 +48,7 @@ public class MarketWatchQuoteDownloader extends QuoteDownloader {
 
     /**
      * Constructor.
-     * 
+     *
      * @param httpPageReader
      *            The HTTP page reader.
      */
@@ -63,7 +63,12 @@ public class MarketWatchQuoteDownloader extends QuoteDownloader {
         try {
             // LOGGER.debug("Requesting stock quote for " + stock);
             // long startTime = System.currentTimeMillis();
-            String content = httpPageReader.read(String.format(URI, stock.getSymbol())).trim();
+            String symbol = stock.getSymbol();
+            if (symbol.equals("RDSB")) {
+                // MarketWatch uses a different stock symbol for Royal Dutch Shell class B shares
+                symbol = "RDS.B";
+            }
+            String content = httpPageReader.read(String.format(URI, symbol)).trim();
             // long duration = System.currentTimeMillis() - startTime;
             // LOGGER.debug(String.format("Received stock quote for %s (%,.0f kB) in %,d ms", stock, content.length() / 1024.0, duration));
 
