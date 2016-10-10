@@ -2,8 +2,6 @@ Portfolio Manager - TODO
 ========================
 
 * Use BigDecimal instead of double for monetary values (rounding errors)
-* Show stock performance (total return over 1, 3, 5 and 10 year)
-* Daily portfolio backup
 * Portfolio result graphs
 * Correctly handle price change percentage outside market hours
 * View application log
@@ -13,6 +11,7 @@ Portfolio Manager - TODO
 * Task progress indicator
 * Extend stock analysis score formula (CR, YDG, CY, DGR)
 * View stock analysis details per share
+* Show stock performance (total return over 1, 3, 5 and 10 year)
 * Update stock analysis (all stocks) and show scores
 * View income overview ('Income' tab)
 * Set/view sector and industry per stock
