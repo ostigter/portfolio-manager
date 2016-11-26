@@ -63,11 +63,7 @@ public class MarketWatchQuoteDownloader extends QuoteDownloader {
         try {
             // LOGGER.debug("Requesting stock quote for " + stock);
             // long startTime = System.currentTimeMillis();
-            String symbol = stock.getSymbol();
-            if (symbol.equals("RDSB")) {
-                // MarketWatch uses a different stock symbol for Royal Dutch Shell class B shares
-                symbol = "RDS.B";
-            }
+            String symbol = stock.getSymbol().replace('-', '.');
             String content = httpPageReader.read(String.format(URI, symbol)).trim();
             // long duration = System.currentTimeMillis() - startTime;
             // LOGGER.debug(String.format("Received stock quote for %s (%,.0f kB) in %,d ms", stock, content.length() / 1024.0, duration));
