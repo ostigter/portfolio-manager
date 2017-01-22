@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,8 @@
 package org.ozsoft.portfoliomanager.ui.table.column;
 
 import java.awt.Color;
+import java.math.BigDecimal;
+import java.math.MathContext;
 
 import org.ozsoft.datatable.DefaultColumnRenderer;
 import org.ozsoft.portfoliomanager.ui.UIConstants;
@@ -54,7 +56,19 @@ public class ResultColumnRenderer extends DefaultColumnRenderer {
 
     @Override
     public String formatValue(Object value) {
-        if (value instanceof Double) {
+        if (value instanceof BigDecimal) {
+            BigDecimal numericValue = (BigDecimal) value;
+            if (numericValue.signum() > 0) {
+                textColor = UIConstants.DARKER_GREEN;
+                return String.format(positiveFormat, numericValue);
+            } else if (numericValue.signum() < 0) {
+                textColor = Color.RED;
+                return String.format(negativeFormat, numericValue.abs(MathContext.DECIMAL64));
+            } else {
+                // Empty value on no change.
+                return null;
+            }
+        } else if (value instanceof Double) {
             double numericValue = (double) value;
             if (numericValue > 0.0) {
                 textColor = UIConstants.DARKER_GREEN;
@@ -63,10 +77,12 @@ public class ResultColumnRenderer extends DefaultColumnRenderer {
                 textColor = Color.RED;
                 return String.format(negativeFormat, Math.abs(numericValue));
             } else {
+                // Empty value on no change.
                 return null;
             }
         } else {
-            return null;
+            textColor = Color.RED;
+            return "<ERROR>";
         }
     }
 

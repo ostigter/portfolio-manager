@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,14 +18,18 @@
 
 package org.ozsoft.portfoliomanager.domain;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.ozsoft.portfoliomanager.util.MathUtils;
+
 /**
  * Stock performance during a specific time range.
- * 
+ *
  * @author Oscar Stigter
  */
 public class StockPerformance {
@@ -34,19 +38,19 @@ public class StockPerformance {
 
     private final int duration;
 
-    private double startPrice;
+    private BigDecimal startPrice;
 
-    private double endPrice;
+    private BigDecimal endPrice;
 
-    private double lowPrice;
+    private BigDecimal lowPrice;
 
-    private double highPrice;
+    private BigDecimal highPrice;
 
-    private double change;
+    private BigDecimal change;
 
-    private double changePerc;
+    private BigDecimal changePerc;
 
-    private double volatility;
+    private BigDecimal volatility;
 
     public StockPerformance(List<ClosingPrice> prices, TimeRange dateFilter) {
         this.prices = new ArrayList<ClosingPrice>();
@@ -64,24 +68,25 @@ public class StockPerformance {
         int count = this.prices.size();
         startPrice = this.prices.get(0).getValue();
         endPrice = this.prices.get(count - 1).getValue();
-        lowPrice = Double.MAX_VALUE;
-        highPrice = Double.MIN_VALUE;
-        change = endPrice - startPrice;
-        changePerc = (change / startPrice) * 100.0;
-        double slope = change / count;
+        lowPrice = new BigDecimal(99999);
+        highPrice = BigDecimal.ZERO;
+        change = endPrice.subtract(startPrice);
+        changePerc = MathUtils.perc(change, startPrice);
+        BigDecimal slope = change.divide(new BigDecimal(count), MathContext.DECIMAL64);
 
         for (int i = 0; i < count; i++) {
-            double p = this.prices.get(i).getValue();
-            if (p < lowPrice) {
+            BigDecimal p = this.prices.get(i).getValue();
+            if (p.compareTo(lowPrice) < 0) {
                 lowPrice = p;
             }
-            if (p > highPrice) {
+            if (p.compareTo(highPrice) > 0) {
                 highPrice = p;
             }
-            double avg = startPrice + (i * slope);
-            volatility += Math.abs(p - avg) / p * 100.0;
+            BigDecimal avg = startPrice.add(new BigDecimal(i).multiply(slope));
+
+            volatility = volatility.add(MathUtils.abs(p, avg).divide(p, MathContext.DECIMAL64).multiply(MathUtils.HUNDRED));
         }
-        volatility /= count;
+        volatility = volatility.divide(new BigDecimal(count), MathContext.DECIMAL64);
     }
 
     public List<ClosingPrice> getPrices() {
@@ -89,47 +94,48 @@ public class StockPerformance {
     }
 
     public double getStartPrice() {
-        return startPrice;
+        return startPrice.doubleValue();
     }
 
     public double getEndPrice() {
-        return endPrice;
+        return endPrice.doubleValue();
     }
 
     public double getLowPrice() {
-        return lowPrice;
+        return lowPrice.doubleValue();
     }
 
     public double getHighPrice() {
-        return highPrice;
+        return highPrice.doubleValue();
     }
 
     public double getChange() {
-        return change;
+        return change.doubleValue();
     }
 
     public double getChangePerc() {
-        return changePerc;
+        return changePerc.doubleValue();
     }
 
     public double getVolatility() {
-        return volatility;
+        return volatility.doubleValue();
     }
 
     public double getCagr() {
         if (duration < 1) {
-            return changePerc;
+            return changePerc.doubleValue();
         } else {
-            return (Math.pow(endPrice / startPrice, 1.0 / duration) - 1.0) * 100.0;
+            return (Math.pow(endPrice.divide(startPrice, MathContext.DECIMAL64).doubleValue(), 1.0 / duration) - 1.0) * 100.0;
         }
     }
 
     public double getDiscount() {
-        double discount = ((highPrice - endPrice) / (highPrice - lowPrice)) * 100.0;
-        if (discount < 0.0) {
+        BigDecimal discount = MathUtils.perc(highPrice.subtract(endPrice, MathContext.DECIMAL64),
+                highPrice.subtract(lowPrice, MathContext.DECIMAL64));
+        if (discount.signum() < 0) {
             return 0.0;
         } else {
-            return discount;
+            return discount.doubleValue();
         }
     }
 }

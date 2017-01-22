@@ -1,7 +1,6 @@
 Portfolio Manager - TODO
 ========================
 
-* Use BigDecimal instead of double for monetary values (rounding errors)
 * Portfolio result graphs
 * Correctly handle price change percentage outside market hours
 * View application log

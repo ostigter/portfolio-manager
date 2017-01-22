@@ -1,14 +1,16 @@
 package org.ozsoft.portfoliomanager.domain;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Calendar;
 
 public class Results {
 
     private int noOfDays;
 
-    private double costs;
+    private BigDecimal costs;
 
-    private double income;
+    private BigDecimal income;
 
     private Calendar lastDay;
 
@@ -29,33 +31,33 @@ public class Results {
         }
     }
 
-    public double getCosts() {
+    public BigDecimal getCosts() {
         return costs;
     }
 
-    public double getAverageCosts() {
+    public BigDecimal getAverageCosts() {
         if (noOfDays > 0) {
-            return costs / noOfDays;
+            return costs.divide(new BigDecimal(noOfDays), MathContext.DECIMAL64);
         } else {
-            return 0.0;
+            return BigDecimal.ZERO;
         }
     }
 
-    public void addCosts(double cost) {
-        costs += cost;
+    public void addCosts(BigDecimal cost) {
+        this.costs = this.costs.add(cost);
     }
 
-    public double getIncome() {
+    public BigDecimal getIncome() {
         return income;
     }
 
-    public void addIncome(double income) {
-        this.income += income;
+    public void addIncome(BigDecimal income) {
+        this.income = this.income.add(income);
     }
 
     public void clear() {
         noOfDays = 0;
-        // costs = 0.0;
-        income = 0.0;
+        costs = BigDecimal.ZERO;
+        income = BigDecimal.ZERO;
     }
 }

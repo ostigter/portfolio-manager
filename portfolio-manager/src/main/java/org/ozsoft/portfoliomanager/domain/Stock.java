@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,9 +18,13 @@
 
 package org.ozsoft.portfoliomanager.domain;
 
+import java.math.BigDecimal;
+
+import org.ozsoft.portfoliomanager.util.MathUtils;
+
 /**
  * Common stock, issued by a company.
- * 
+ *
  * @author Oscar Stigter
  */
 public class Stock implements Comparable<Stock> {
@@ -31,17 +35,17 @@ public class Stock implements Comparable<Stock> {
 
     private Exchange exchange = Exchange.UNKNOWN;
 
-    private double price;
+    private BigDecimal price = BigDecimal.ZERO;
 
     private double changePerc;
 
     private double peRatio = -1.0;
 
-    private double targetPrice;
+    private BigDecimal targetPrice = BigDecimal.ZERO;
 
-    private double divRate;
+    private BigDecimal divRate = BigDecimal.ZERO;
 
-    private double divGrowth = 0.0;
+    private BigDecimal divGrowth = BigDecimal.ZERO;
 
     private int yearsDivGrowth = -1;
 
@@ -55,7 +59,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Constructor.
-     * 
+     *
      * @param symbol
      *            Ticket symbol (e.g. "MSFT").
      * @param name
@@ -68,7 +72,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Returns the ticket symbol.
-     * 
+     *
      * @return The ticket symbol.
      */
     public String getSymbol() {
@@ -77,7 +81,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Returns the name.
-     * 
+     *
      * @return The name.
      */
     public String getName() {
@@ -86,7 +90,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Sets the name.
-     * 
+     *
      * @param name
      *            The name.
      */
@@ -96,7 +100,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Gets the stock exchange this stock is traded on.
-     * 
+     *
      * @return The stock exchange.
      */
     public Exchange getExchange() {
@@ -105,7 +109,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Sets the stock exchange this stock is traded on.
-     * 
+     *
      * @param exchange
      *            The stock exchange.
      */
@@ -115,26 +119,26 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Returns the current price.
-     * 
+     *
      * @return The current price.
      */
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
     /**
      * Sets the current price.
-     * 
+     *
      * @param price
      *            The current price.
      */
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
     /**
      * Returns the current price change percentage based on the previous closing price.
-     * 
+     *
      * @return The price change percentage.
      */
     public double getChangePerc() {
@@ -143,7 +147,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Sets the current price change percentage based on the previous closing price.
-     * 
+     *
      * @param changePerc
      *            The price change percentage.
      */
@@ -153,7 +157,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Returns the trailing P/E (price/earnings) ratio.
-     * 
+     *
      * @return The trailing P/E ratio.
      */
     public double getPeRatio() {
@@ -162,7 +166,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Sets the trailing P/E (price/earnings) ratio.
-     * 
+     *
      * @param peRatio
      *            The P/E ratio.
      */
@@ -172,67 +176,63 @@ public class Stock implements Comparable<Stock> {
 
     /*
      * Returns the target price.
-     * 
+     *
      * @return The target price.
      */
-    public double getTargetPrice() {
+    public BigDecimal getTargetPrice() {
         return targetPrice;
     }
 
     /**
      * Sets he target price.
-     * 
+     *
      * @param targetPrice
      *            The target price.
      */
-    public void setTargetPrice(double targetPrice) {
+    public void setTargetPrice(BigDecimal targetPrice) {
         this.targetPrice = targetPrice;
     }
 
     /**
      * Returns the target price index.
-     * 
+     *
      * @return The target price index.
      */
-    public double getTargetPriceIndex() {
-        if (targetPrice > 0.0 && price > 0.0) {
-            return (targetPrice / price) * 100.0;
-        } else {
-            return 0.0;
-        }
+    public BigDecimal getTargetPriceIndex() {
+        return MathUtils.perc(targetPrice, price);
     }
 
     /**
      * Returns the current, annual dividend rate per share.
-     * 
+     *
      * @return The dividend rate.
      */
-    public double getDivRate() {
+    public BigDecimal getDivRate() {
         return divRate;
     }
 
     /**
      * Sets the current, annual dividend rate per share.
-     * 
+     *
      * @param divRate
      *            The dividend rate.
      */
-    public void setDivRate(double divRate) {
+    public void setDivRate(BigDecimal divRate) {
         this.divRate = divRate;
     }
 
     /**
      * Returns the current dividend yield.
-     * 
+     *
      * @return The current dividend yield.
      */
     public double getYield() {
-        if (price > 0.0 && divRate > 0.0) {
-            double yield = (divRate / price) * 100.0;
-            if (yield < 0.0) {
-                yield = 0.0;
+        if (price.signum() > 0 && divRate.signum() > 0) {
+            BigDecimal yield = MathUtils.perc(divRate, price);
+            if (yield.signum() < 0) {
+                yield = BigDecimal.ZERO;
             }
-            return (divRate / price) * 100.0;
+            return yield.doubleValue();
         } else {
             return 0.0;
         }
@@ -240,7 +240,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Returns the comment (if set).
-     * 
+     *
      * @return The comment, or {@code null} if not set.
      */
     public String getComment() {
@@ -249,7 +249,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Sets the comment.
-     * 
+     *
      * @param comment
      *            The comment, or {@code null} to clear.
      */
@@ -259,7 +259,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Returns the 'stock level'.
-     * 
+     *
      * @return The 'stock level'.
      */
     public StockLevel getLevel() {
@@ -268,7 +268,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Sets the 'stock level'.
-     * 
+     *
      * @param level
      *            The 'stock level'.
      */
@@ -278,7 +278,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Returns the number of consecutive years of dividend growth.
-     * 
+     *
      * @return The number of consecutive years of dividend growth.
      */
     public int getYearsDivGrowth() {
@@ -287,7 +287,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Sets the number of consecutive years of dividend growth.
-     * 
+     *
      * @param yearsDivGrowth
      *            The number of consecutive years of dividend growth.
      */
@@ -297,26 +297,26 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Returns the 5-year compounded annual dividend growth rate.
-     * 
+     *
      * @return the 5-year compounded annual dividend growth rate.
      */
-    public double getDivGrowth() {
+    public BigDecimal getDivGrowth() {
         return divGrowth;
     }
 
     /**
      * Sets the 5-year compounded annual dividend growth rate.
-     * 
+     *
      * @param divGrowth
      *            The 5-year compounded annual dividend growth rate.
      */
-    public void setDivGrowth(double divGrowth) {
+    public void setDivGrowth(BigDecimal divGrowth) {
         this.divGrowth = divGrowth;
     }
 
     /**
      * Returns the current credit rating.
-     * 
+     *
      * @return The current credit rating.
      */
     public CreditRating getCreditRating() {
@@ -325,7 +325,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Sets the credit rating.
-     * 
+     *
      * @param creditRating
      *            The credit rating.
      */
@@ -335,7 +335,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Returns the current Morningstar value rating.
-     * 
+     *
      * @return The current Morningstar value rating.
      */
     public int getStarRating() {
@@ -344,7 +344,7 @@ public class Stock implements Comparable<Stock> {
 
     /**
      * Sets the current Morningstar value rating.
-     * 
+     *
      * @param starRating
      *            The current Morningstar value rating.
      */

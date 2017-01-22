@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@
 package org.ozsoft.portfoliomanager.services.downloader;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,9 +29,9 @@ import org.ozsoft.portfoliomanager.util.HttpPageReader;
 /**
  * Stock quote downloader using Yahoo Finance's API (CSV, delayed). <br />
  * <br />
- * 
+ *
  * Updates the stock's last price, price change percentage and P/E ratio.
- * 
+ *
  * @author Oscar Stigter
  */
 public class YahooFinanceQuoteDownloader extends QuoteDownloader {
@@ -41,7 +42,7 @@ public class YahooFinanceQuoteDownloader extends QuoteDownloader {
 
     /**
      * Constructor.
-     * 
+     *
      * @param httpPageReader
      *            The HTTP page reader.
      */
@@ -60,8 +61,8 @@ public class YahooFinanceQuoteDownloader extends QuoteDownloader {
             String[] fields = line.split(",");
             if (fields.length == 3) {
                 try {
-                    double price = Double.parseDouble(fields[0]);
-                    if (price != stock.getPrice()) {
+                    BigDecimal price = new BigDecimal(fields[0]);
+                    if (!price.equals(stock.getPrice())) {
                         stock.setPrice(price);
                         stock.setChangePerc(fields[2].equals("N/A") ? 0.0 : Double.parseDouble(fields[1].replaceAll("[\"%]", "")));
                         stock.setPeRatio(fields[2].equals("N/A") ? -1.0 : Double.parseDouble(fields[2]));

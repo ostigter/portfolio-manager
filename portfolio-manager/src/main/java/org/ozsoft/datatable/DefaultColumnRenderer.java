@@ -1,13 +1,14 @@
 package org.ozsoft.datatable;
 
 import java.awt.Color;
+import java.math.BigDecimal;
 
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  * Default column renderer.
- * 
+ *
  * @author Oscar Stigter
  */
 public class DefaultColumnRenderer extends DefaultTableCellRenderer implements ColumnRenderer {
@@ -33,7 +34,7 @@ public class DefaultColumnRenderer extends DefaultTableCellRenderer implements C
 
     /**
      * Constructor with a specific horizontal alignment.
-     * 
+     *
      * @param horizontalAlignment
      *            The horizontal alignment as {@link javax.swing.SwingConstants}.
      */
@@ -43,7 +44,7 @@ public class DefaultColumnRenderer extends DefaultTableCellRenderer implements C
 
     /**
      * Constructor with a specific horizontal alignment and decimal precision.
-     * 
+     *
      * @param horizontalAlignment
      *            The horizontal alignment as {@link javax.swing.SwingConstants}.
      * @param decimalPrecision
@@ -56,7 +57,7 @@ public class DefaultColumnRenderer extends DefaultTableCellRenderer implements C
 
     /**
      * Returns the decimal precision.
-     * 
+     *
      * @return The decimal precision.
      */
     public final int getDecimalPrecision() {
@@ -85,7 +86,7 @@ public class DefaultColumnRenderer extends DefaultTableCellRenderer implements C
 
     /**
      * Returns whether this column renderer is for the footer row.
-     * 
+     *
      * @return <code>true</code> if for the footer row, otherwis <code>false</code>.
      */
     protected boolean isFooter() {
@@ -96,6 +97,9 @@ public class DefaultColumnRenderer extends DefaultTableCellRenderer implements C
     public String formatValue(Object value) {
         if (value == null) {
             return null;
+        } else if (value instanceof BigDecimal) {
+            String format = String.format("%%,.%df", getDecimalPrecision());
+            return String.format(format, value);
         } else if (value instanceof Double) {
             String format = String.format("%%,.%df", getDecimalPrecision());
             return String.format(format, value);
@@ -128,7 +132,7 @@ public class DefaultColumnRenderer extends DefaultTableCellRenderer implements C
 
     /**
      * Sets the default horizontal alignment based on a cell value.
-     * 
+     *
      * @param value
      *            The cell value.
      */

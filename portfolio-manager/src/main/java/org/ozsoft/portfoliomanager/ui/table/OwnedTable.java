@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +51,7 @@ import org.ozsoft.portfoliomanager.ui.table.column.PercentageColumnRenderer;
 import org.ozsoft.portfoliomanager.ui.table.column.ResultColumnRenderer;
 import org.ozsoft.portfoliomanager.ui.table.column.YDGColumnRenderer;
 import org.ozsoft.portfoliomanager.ui.table.column.YieldColumnRenderer;
+import org.ozsoft.portfoliomanager.util.MathUtils;
 
 /**
  * Table with the stocks that are currently owned or have been at some point in time, i.e. all open and closed positions. <br />
@@ -176,15 +178,15 @@ public class OwnedTable extends DataTable {
 
         // Populate table with portfolio positions (owned stocks).
         Portfolio portfolio = config.getPortfolio();
-        double currentPortfolioCost = portfolio.getCurrentCost();
+        BigDecimal currentPortfolioCost = portfolio.getCurrentCost();
         for (Position p : portfolio.getPositions()) {
-            if (p.getNoOfShares() > 0 || showClosedPositions) {
+            if (p.getNoOfShares().intValue() > 0 || showClosedPositions) {
                 Stock s = p.getStock();
-                double weight = (currentPortfolioCost > 0.0) ? (p.getCurrentCost() / currentPortfolioCost) * 100.0 : 0.0;
-                addRow(s.getName(), s.getSymbol(), s.getPrice(), s.getChangePerc(), s.getYield(), s.getDivGrowth(), s.getYearsDivGrowth(),
-                        s.getCreditRating(), p.getNoOfShares(), p.getCurrentCost(), p.getCostPerShare(), p.getCurrentValue(), weight,
-                        p.getCurrentResult(), p.getCurrentResultPercentage(), p.getAnnualIncome(), p.getYieldOnCost(), p.getTotalIncome(),
-                        p.getRealizedResult(), p.getTotalReturn(), "  " + s.getComment());
+                BigDecimal weight = MathUtils.perc(p.getCurrentCost(), currentPortfolioCost);
+                addRow(s.getName(), s.getSymbol(), s.getPrice(), s.getChangePerc(), s.getYield(), s.getDivGrowth().doubleValue(),
+                        s.getYearsDivGrowth(), s.getCreditRating(), p.getNoOfShares().intValue(), p.getCurrentCost(), p.getCostPerShare(),
+                        p.getCurrentValue(), weight, p.getCurrentResult(), p.getCurrentResultPercentage(), p.getAnnualIncome(), p.getYieldOnCost(),
+                        p.getTotalIncome(), p.getRealizedResult(), p.getTotalReturn(), "  " + s.getComment());
             }
         }
 

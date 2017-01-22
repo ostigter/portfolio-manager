@@ -26,6 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -62,7 +63,7 @@ public class Configuration {
 
     private static final File ANALYSIS_RESULT_FILE = new File(DATA_DIR, "stock_analysis.csv");
 
-    private static final double INCOME_TAX_RATE = 0.15;
+    private static final BigDecimal INCOME_TAX_RATE = new BigDecimal("0.15");
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -140,7 +141,7 @@ public class Configuration {
     public Set<Stock> getOwnedStocks() {
         Set<Stock> ownedStocks = new TreeSet<Stock>();
         for (Position position : getPortfolio().getPositions()) {
-            if (showClosedPositions || position.getNoOfShares() > 0) {
+            if (showClosedPositions || position.getNoOfShares().signum() > 0) {
                 ownedStocks.add(position.getStock());
             }
         }
@@ -313,7 +314,7 @@ public class Configuration {
      *
      * @return The income tax rate.
      */
-    public static double getIncomeTaxRate() {
+    public static BigDecimal getIncomeTaxRate() {
         // TODO: Make income tax rate configurable (globally and/or per stock).
         return INCOME_TAX_RATE;
     }

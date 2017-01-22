@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +25,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
@@ -409,24 +410,24 @@ public class EditTransactionDialog extends Dialog {
             return;
         }
 
-        double price = -1.0;
+        BigDecimal price = BigDecimal.ZERO;
         try {
-            price = Double.parseDouble(priceText.getText().trim().replace(',', '.'));
+            price = new BigDecimal(priceText.getText().trim().replace(',', '.'));
         } catch (NumberFormatException e) {
             // Handled by range check below.
         }
-        if (price < 0.01) {
+        if (price.signum() <= 0) {
             JOptionPane.showMessageDialog(null, "Invalid price (must be greater than $0.00).", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        double cost = 0.0;
+        BigDecimal cost = BigDecimal.ZERO;
         try {
-            cost = Double.parseDouble(costsText.getText().trim().replace(',', '.'));
+            cost = new BigDecimal(costsText.getText().trim().replace(',', '.'));
         } catch (NumberFormatException e) {
             // Handled by range check below.
         }
-        if (cost < 0.0) {
+        if (cost.signum() < 0) {
             JOptionPane.showMessageDialog(null, "Invalid costs (must be equal to or greater than $0).", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -434,7 +435,7 @@ public class EditTransactionDialog extends Dialog {
         transaction.setSymbol(symbol);
         transaction.setDate(date.getTime());
         transaction.setType(type);
-        transaction.setNoOfShares(noOfShares);
+        transaction.setNoOfShares(new BigDecimal(noOfShares));
         transaction.setPrice(price);
         transaction.setCost(cost);
 

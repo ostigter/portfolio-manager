@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -201,8 +201,9 @@ public class StockTable extends DataTable {
     public final void update() {
         clear();
         for (Stock s : getStocks()) {
-            addRow(s.getName(), s.getSymbol(), s.getPrice(), s.getChangePerc(), s.getPeRatio(), s.getTargetPrice(), s.getTargetPriceIndex(),
-                    s.getStarRating(), s.getDivRate(), s.getYield(), s.getDivGrowth(), s.getYearsDivGrowth(), s.getCreditRating(), s.getComment());
+            addRow(s.getName(), s.getSymbol(), s.getPrice(), s.getChangePerc(), s.getPeRatio(), s.getTargetPrice(),
+                    s.getTargetPriceIndex().doubleValue(), s.getStarRating(), s.getDivRate(), s.getYield(), s.getDivGrowth().doubleValue(),
+                    s.getYearsDivGrowth(), s.getCreditRating(), s.getComment());
         }
         super.update();
     }

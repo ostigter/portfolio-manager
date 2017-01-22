@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,34 +18,39 @@
 
 package org.ozsoft.portfoliomanager.domain;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+
+import org.ozsoft.portfoliomanager.util.MathUtils;
+
 /**
  * Position in a single stock, as part of a stock portfolio.
- * 
+ *
  * @author Oscar Stigter
  */
 public class Position implements Comparable<Position> {
 
-    private static final double MIN_COST = 0.50;
+    private static final BigDecimal MIN_COST = new BigDecimal("0.01");
 
     private final Configuration config = Configuration.getInstance();
 
     private final Stock stock;
 
-    private int noOfShares = 0;
+    private BigDecimal noOfShares = BigDecimal.ZERO;
 
-    private double currentCost = 0.0;
+    private BigDecimal currentCost = BigDecimal.ZERO;
 
-    private double totalCost = 0.0;
+    private BigDecimal totalCost = BigDecimal.ZERO;
 
-    private double totalIncome = 0.0;
+    private BigDecimal totalIncome = BigDecimal.ZERO;
 
-    private double realizedResult = 0.0;
+    private BigDecimal realizedResult = BigDecimal.ZERO;
 
-    private double totalReturn = 0.0;
+    private BigDecimal totalReturn = BigDecimal.ZERO;
 
     /**
      * Constructor.
-     * 
+     *
      * @param stock
      *            The stock.
      */
@@ -55,7 +60,7 @@ public class Position implements Comparable<Position> {
 
     /**
      * Returns the stock.
-     * 
+     *
      * @return The stock.
      */
     public Stock getStock() {
@@ -64,157 +69,157 @@ public class Position implements Comparable<Position> {
 
     /**
      * Returns the currently owned number of shares.
-     * 
+     *
      * @return The number of shares.
      */
-    public int getNoOfShares() {
+    public BigDecimal getNoOfShares() {
         return noOfShares;
     }
 
     /**
      * Sets the currently owned number of shares.
-     * 
+     *
      * @param noOfShares
      *            The number of shares.
      */
-    public void setNoOfShares(int noOfShares) {
+    public void setNoOfShares(BigDecimal noOfShares) {
         this.noOfShares = noOfShares;
     }
 
     /**
      * Returns the current costbase (open position only, otherwise 0).
-     * 
+     *
      * @return The current costbase.
      */
-    public double getCurrentCost() {
+    public BigDecimal getCurrentCost() {
         return currentCost;
     }
 
     /**
      * Returns the current market value (open position only, otherwise 0).
-     * 
+     *
      * @return The current market value.
      */
-    public double getCurrentValue() {
-        return noOfShares * stock.getPrice();
+    public BigDecimal getCurrentValue() {
+        return noOfShares.multiply(stock.getPrice(), MathContext.DECIMAL64);
     }
 
     /**
      * Returns th current result (market value minus costbase; open position only, otherwise 0)
-     * 
+     *
      * @return The current result.
      */
-    public double getCurrentResult() {
-        return getCurrentValue() - getCurrentCost();
+    public BigDecimal getCurrentResult() {
+        return getCurrentValue().subtract(getCurrentCost());
     }
 
     /**
      * Returns the current result as percentage of the costbase (open position only, otherwise 0).
-     * 
+     *
      * @return
      */
-    public double getCurrentResultPercentage() {
-        double currentInvestment = getCurrentCost();
-        if (currentInvestment > 0.0) {
-            return (getCurrentResult() / currentInvestment) * 100.0;
+    public BigDecimal getCurrentResultPercentage() {
+        BigDecimal currentInvestment = getCurrentCost();
+        if (currentInvestment.signum() > 0) {
+            return MathUtils.perc(getCurrentResult(), currentInvestment);
         } else {
-            return 0.00;
+            return BigDecimal.ZERO;
         }
     }
 
     /**
      * Returns the total costbase.
-     * 
+     *
      * @return The total costbase.
      */
-    public double getTotalCost() {
+    public BigDecimal getTotalCost() {
         return totalCost;
     }
 
-    public double getCostPerShare() {
-        double currentInvestment = getCurrentCost();
-        if (currentInvestment > 0.0) {
-            return currentInvestment / noOfShares;
+    public BigDecimal getCostPerShare() {
+        BigDecimal currentInvestment = getCurrentCost();
+        if (currentInvestment.signum() > 0) {
+            return currentInvestment.divide(noOfShares, MathContext.DECIMAL64);
         } else {
-            return 0.00;
+            return BigDecimal.ZERO;
         }
     }
 
-    public double getAnnualIncome() {
-        double annualIncome = noOfShares * stock.getDivRate();
+    public BigDecimal getAnnualIncome() {
+        BigDecimal annualIncome = noOfShares.multiply(stock.getDivRate(), MathContext.DECIMAL64);
         if (config.isDeductIncomeTax()) {
-            annualIncome *= (1.0 - Configuration.getIncomeTaxRate());
+            annualIncome = annualIncome.multiply(BigDecimal.ONE.subtract(Configuration.getIncomeTaxRate()), MathContext.DECIMAL64);
         }
         return annualIncome;
     }
 
-    public double getTotalIncome() {
+    public BigDecimal getTotalIncome() {
         return totalIncome;
     }
 
-    public double getYieldOnCost() {
-        if (currentCost > 0.0) {
-            return (getAnnualIncome() / currentCost) * 100.0;
+    public BigDecimal getYieldOnCost() {
+        if (currentCost.signum() > 0) {
+            return MathUtils.perc(getAnnualIncome(), currentCost);
         } else {
-            return 0.0;
+            return BigDecimal.ZERO;
         }
     }
 
-    public double getRealizedResult() {
+    public BigDecimal getRealizedResult() {
         return realizedResult;
     }
 
-    public double getTotalReturn() {
-        return getCurrentResult() + totalReturn;
+    public BigDecimal getTotalReturn() {
+        return getCurrentResult().add(totalReturn);
     }
 
-    public double getTotalReturnPercentage() {
-        if (totalCost > 0.0) {
+    public BigDecimal getTotalReturnPercentage() {
+        if (totalCost.signum() > 0) {
             // FIXME: Total return based on average costbase instead of total costbase.
-            return (getTotalReturn() / totalCost) * 100.0;
+            return MathUtils.perc(getTotalReturn(), totalCost);
         } else {
-            return 0.00;
+            return BigDecimal.ZERO;
         }
     }
 
     /**
      * Adds a transaction.
-     * 
+     *
      * @param tx
      *            The transacton.
      */
     public void addTransaction(Transaction tx) {
         switch (tx.getType()) {
             case BUY:
-                this.noOfShares += tx.getNoOfShares();
-                double cost = (tx.getNoOfShares() * tx.getPrice()) + tx.getCost();
-                currentCost += cost;
-                totalCost += cost;
+                noOfShares = noOfShares.add(tx.getNoOfShares());
+                BigDecimal cost = tx.getNoOfShares().multiply(tx.getPrice()).add(tx.getCost());
+                currentCost = currentCost.add(cost);
+                totalCost = totalCost.add(cost);
                 break;
             case SELL:
-                if (tx.getNoOfShares() > noOfShares) {
+                if (tx.getNoOfShares().compareTo(noOfShares) > 0) {
                     throw new IllegalArgumentException("Cannot sell more shares than owned");
                 }
-                double avgPrice = currentCost / noOfShares;
-                double value = tx.getNoOfShares() * avgPrice;
-                currentCost -= value;
-                if (currentCost < MIN_COST) {
+                BigDecimal avgPrice = currentCost.divide(noOfShares, MathContext.DECIMAL64);
+                BigDecimal value = tx.getNoOfShares().multiply(avgPrice);
+                currentCost = currentCost.subtract(value);
+                if (currentCost.compareTo(MIN_COST) < 0) {
                     // Round very low cost down to 0 to avoid rounding errors.
-                    currentCost = 0.0;
+                    currentCost = BigDecimal.ZERO;
                 }
-                totalCost += tx.getCost();
-                double profit = tx.getNoOfShares() * (tx.getPrice() - avgPrice) - tx.getCost();
-                realizedResult += profit;
-                totalReturn += profit;
-                noOfShares -= tx.getNoOfShares();
+                totalCost = totalCost.add(tx.getCost());
+                BigDecimal profit = tx.getNoOfShares().multiply(tx.getPrice().subtract(avgPrice)).subtract(tx.getCost());
+                realizedResult = realizedResult.add(profit);
+                totalReturn = totalReturn.add(profit);
+                noOfShares = noOfShares.subtract(tx.getNoOfShares());
                 break;
             case DIVIDEND:
-                double income = tx.getNoOfShares() * tx.getPrice();
+                BigDecimal income = tx.getNoOfShares().multiply(tx.getPrice());
                 if (config.isDeductIncomeTax()) {
-                    income *= (1.0 - Configuration.getIncomeTaxRate());
+                    income = income.multiply(BigDecimal.ONE.subtract(Configuration.getIncomeTaxRate()));
                 }
-                totalIncome += income;
-                totalReturn += income;
+                totalIncome = totalIncome.add(income);
+                totalReturn = totalReturn.add(income);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid transaction type");

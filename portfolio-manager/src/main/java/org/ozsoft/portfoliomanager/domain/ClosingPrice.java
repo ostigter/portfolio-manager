@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,13 +18,14 @@
 
 package org.ozsoft.portfoliomanager.domain;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
  * Stock closing price.
- * 
+ *
  * @author Oscar Stigter
  */
 public class ClosingPrice implements Comparable<ClosingPrice> {
@@ -33,9 +34,9 @@ public class ClosingPrice implements Comparable<ClosingPrice> {
 
     private final Date date;
 
-    private final double value;
+    private final BigDecimal value;
 
-    public ClosingPrice(Date date, double value) {
+    public ClosingPrice(Date date, BigDecimal value) {
         this.date = date;
         this.value = value;
     }
@@ -44,7 +45,7 @@ public class ClosingPrice implements Comparable<ClosingPrice> {
         return date;
     }
 
-    public double getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 

@@ -38,9 +38,9 @@ public class YDGColumnRenderer extends DefaultColumnRenderer {
     public String formatValue(Object value) {
         if (value instanceof Integer) {
             int numericValue = (int) value;
-            if (numericValue < 5) {
+            if (numericValue < 1) {
                 backgroundColor = Color.ORANGE;
-                return "<5";
+                return "0";
             } else {
                 if (numericValue >= 25) {
                     backgroundColor = UIConstants.DARK_GREEN;

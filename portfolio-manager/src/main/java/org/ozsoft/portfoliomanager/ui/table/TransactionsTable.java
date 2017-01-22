@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -157,17 +159,17 @@ public class TransactionsTable extends DataTable {
             Stock stock = config.getStock(symbol);
             String stockName = (stock != null) ? stock.getName() : "<ERROR: Stock deleted>";
             TransactionType type = t.getType();
-            int noOfShares = (type == TransactionType.SELL) ? -1 * t.getNoOfShares() : t.getNoOfShares();
-            double price = t.getPrice();
-            double cost = t.getCost();
-            double total = noOfShares * price;
+            BigDecimal noOfShares = (type == TransactionType.SELL) ? t.getNoOfShares().multiply(new BigDecimal("-1")) : t.getNoOfShares();
+            BigDecimal price = t.getPrice();
+            BigDecimal cost = t.getCost();
+            BigDecimal total = noOfShares.multiply(price);
             if (type == TransactionType.BUY) {
-                total += cost;
+                total = total.add(cost);
             } else {
-                total -= cost;
+                total = total.subtract(cost, MathContext.DECIMAL64);
             }
 
-            addRow(t.getId(), t.getDate(), stockName, symbol, type, noOfShares, price, cost, total);
+            addRow(t.getId(), t.getDate(), stockName, symbol, type, noOfShares.intValue(), price, cost, total);
         }
         super.update();
     }

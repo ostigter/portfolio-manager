@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -256,9 +257,8 @@ public class EditStockDialog extends Dialog {
         symbolField.setText(stock.getSymbol());
         creditRatingBox.setSelectedItem(stock.getCreditRating().getText());
         commentField.setText(stock.getComment());
-        double targetPrice = stock.getTargetPrice();
-        if (targetPrice > 0.0) {
-            targetPriceField.setText(String.format("%.2f", targetPrice));
+        if (stock.getTargetPrice().signum() > 0) {
+            targetPriceField.setText(String.format("%.2f", stock.getTargetPrice()));
         } else {
             targetPriceField.setText("");
         }
@@ -294,10 +294,10 @@ public class EditStockDialog extends Dialog {
             return;
         }
         String targetPriceText = targetPriceField.getText().trim().replace(',', '.');
-        double targetPrice = 0.0;
+        BigDecimal targetPrice = BigDecimal.ZERO;
         if (targetPriceText.length() > 0) {
             try {
-                targetPrice = Double.parseDouble(targetPriceText);
+                targetPrice = new BigDecimal(targetPriceText);
             } catch (NumberFormatException e) {
                 showError("Invalid target price.");
                 return;

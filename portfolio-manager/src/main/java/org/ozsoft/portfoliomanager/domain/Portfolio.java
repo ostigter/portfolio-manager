@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@
 
 package org.ozsoft.portfoliomanager.domain;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,9 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.ozsoft.portfoliomanager.util.MathUtils;
+
 /**
  * Stock portfolio, with transactions and (open/closed) positions.
- * 
+ *
  * @author Oscar Stigter
  */
 public class Portfolio {
@@ -36,19 +39,19 @@ public class Portfolio {
 
     private final Map<Stock, Position> positions;
 
-    private double currentCost;
+    private BigDecimal currentCost;
 
-    private double currentValue;
+    private BigDecimal currentValue;
 
-    private double totalCost;
+    private BigDecimal totalCost;
 
-    private double annualIncome;
+    private BigDecimal annualIncome;
 
-    private double totalIncome;
+    private BigDecimal totalIncome;
 
-    private double realizedResult;
+    private BigDecimal realizedResult;
 
-    private double totalReturn;
+    private BigDecimal totalReturn;
 
     /**
      * Constructor.
@@ -56,11 +59,12 @@ public class Portfolio {
     public Portfolio() {
         transactions = new ArrayList<Transaction>();
         positions = new TreeMap<Stock, Position>();
+        clear();
     }
 
     /**
      * Returns all transactions.
-     * 
+     *
      * @return The transactions.
      */
     public List<Transaction> getTransactions() {
@@ -69,7 +73,7 @@ public class Portfolio {
 
     /**
      * Adds a transaction.
-     * 
+     *
      * @param transaction
      *            The transaction.
      */
@@ -79,7 +83,7 @@ public class Portfolio {
 
     /**
      * Returns all positions of currently or previously owned stocks.
-     * 
+     *
      * @return The positions.
      */
     public Collection<Position> getPositions() {
@@ -88,10 +92,10 @@ public class Portfolio {
 
     /**
      * Returns the position in a specific stock.
-     * 
+     *
      * @param stock
      *            The stock.
-     * 
+     *
      * @return The position if any, otherwise {@code null}.
      */
     public Position getPosition(Stock stock) {
@@ -100,122 +104,110 @@ public class Portfolio {
 
     /**
      * Returns the current costbase (of all open positions).
-     * 
+     *
      * @return The current costbase.
      */
-    public double getCurrentCost() {
+    public BigDecimal getCurrentCost() {
         return currentCost;
     }
 
     /**
      * Returns he current market value (of all open positions).
-     * 
+     *
      * @return The current market value.
      */
-    public double getCurrentValue() {
+    public BigDecimal getCurrentValue() {
         return currentValue;
     }
 
     /**
      * Returns the current result (market value minus costbase of all open positions).
-     * 
+     *
      * @return
      */
-    public double getCurrentResult() {
-        return currentValue - currentCost;
+    public BigDecimal getCurrentResult() {
+        return currentValue.subtract(currentCost);
     }
 
     /**
      * Returs the current result percentage (current result divided by current costbase).
-     * 
+     *
      * @return
      */
-    public double getCurrentResultPercentage() {
-        if (currentCost > 0.0) {
-            return (getCurrentResult() / currentCost) * 100.0;
-        } else {
-            return 0.0;
-        }
+    public BigDecimal getCurrentResultPercentage() {
+        return MathUtils.perc(getCurrentResult(), currentCost);
     }
 
     /**
      * Returns the total costbase (open and closed positions).
-     * 
+     *
      * @return The total costbase.
      */
-    public double getTotalCost() {
+    public BigDecimal getTotalCost() {
         return totalCost;
     }
 
     /**
      * Returns the current annual income (based on open positions).
-     * 
+     *
      * @return The annual income.
      */
-    public double getAnnualIncome() {
+    public BigDecimal getAnnualIncome() {
         return annualIncome;
     }
 
     /**
      * Returns the total received income (open and closed positions).
-     * 
+     *
      * @return The total received income.
      */
-    public double getTotalIncome() {
+    public BigDecimal getTotalIncome() {
         return totalIncome;
     }
 
     /**
      * Returns the current yield-on-cost (annual income divided by current costbase).
-     * 
+     *
      * @return
      */
-    public double getYieldOnCost() {
-        if (currentCost > 0.0) {
-            return (annualIncome / currentCost) * 100.0;
-        } else {
-            return 0.0;
-        }
+    public BigDecimal getYieldOnCost() {
+        return MathUtils.perc(annualIncome, currentCost);
     }
 
     /**
      * Returns the all-time realized result (profit/loss from stock sales).
-     * 
+     *
      * @return The realized result.
      */
-    public double getRealizedResult() {
+    public BigDecimal getRealizedResult() {
         return realizedResult;
     }
 
     /**
      * Returns the all-time total return (open and closed positions). <br />
      * <br />
-     * 
+     *
      * Total Return = Current Result + Realized Result + Total Income
-     * 
+     *
      * @return The total return.
      */
-    public double getTotalReturn() {
+    public BigDecimal getTotalReturn() {
         return totalReturn;
     }
 
     /**
      * Returns the all-time total return percentage (total return divided by total costbase).
-     * 
+     *
      * @return The total return percentage.
      */
-    public double getTotalReturnPercentage() {
+    public BigDecimal getTotalReturnPercentage() {
         // FIXME: Total return based on average costbase instead of total costbase.
-        if (totalCost > 0.0) {
-            return (getTotalReturn() / totalCost) * 100.0;
-        } else {
-            return 0.0;
-        }
+        return MathUtils.perc(getTotalReturn(), totalCost);
     }
 
     /**
      * Updates the portfolio based on the specified configuration (stocks and positions).
-     * 
+     *
      * @param config
      *            The configuration.
      */
@@ -238,13 +230,13 @@ public class Portfolio {
 
         // Update totals based on positions.
         for (Position pos : positions.values()) {
-            currentCost += pos.getCurrentCost();
-            currentValue += pos.getCurrentValue();
-            totalCost += pos.getTotalCost();
-            annualIncome += pos.getAnnualIncome();
-            totalIncome += pos.getTotalIncome();
-            realizedResult += pos.getRealizedResult();
-            totalReturn += pos.getTotalReturn();
+            currentCost = currentCost.add(pos.getCurrentCost());
+            currentValue = currentValue.add(pos.getCurrentValue());
+            totalCost = totalCost.add(pos.getTotalCost());
+            annualIncome = annualIncome.add(pos.getAnnualIncome());
+            totalIncome = totalIncome.add(pos.getTotalIncome());
+            realizedResult = realizedResult.add(pos.getRealizedResult());
+            totalReturn = totalReturn.add(pos.getTotalReturn());
         }
     }
 
@@ -253,12 +245,12 @@ public class Portfolio {
      */
     private void clear() {
         positions.clear();
-        currentCost = 0.0;
-        currentValue = 0.0;
-        totalCost = 0.0;
-        annualIncome = 0.0;
-        totalIncome = 0.0;
-        realizedResult = 0.0;
-        totalReturn = 0.0;
+        currentCost = BigDecimal.ZERO;
+        currentValue = BigDecimal.ZERO;
+        totalCost = BigDecimal.ZERO;
+        annualIncome = BigDecimal.ZERO;
+        totalIncome = BigDecimal.ZERO;
+        realizedResult = BigDecimal.ZERO;
+        totalReturn = BigDecimal.ZERO;
     }
 }

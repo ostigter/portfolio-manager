@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,9 +18,11 @@
 
 package org.ozsoft.portfoliomanager.domain;
 
+import java.math.BigDecimal;
+
 /**
  * Stock transaction.
- * 
+ *
  * @author Oscar Stigter
  */
 public class Transaction implements Comparable<Transaction> {
@@ -33,15 +35,15 @@ public class Transaction implements Comparable<Transaction> {
 
     private TransactionType type;
 
-    private int noOfShares;
+    private BigDecimal noOfShares;
 
-    private double price;
+    private BigDecimal price;
 
-    private double cost;
+    private BigDecimal cost;
 
     /**
      * Returns the transaction ID.
-     * 
+     *
      * @return The transaction ID.
      */
     public int getId() {
@@ -50,7 +52,7 @@ public class Transaction implements Comparable<Transaction> {
 
     /**
      * Sets the transaction ID.
-     * 
+     *
      * @param id
      *            The transaction ID.
      */
@@ -60,7 +62,7 @@ public class Transaction implements Comparable<Transaction> {
 
     /**
      * Returns the transaction date.
-     * 
+     *
      * @return The transaction date as timestamp in milliseconds.
      */
     public long getDate() {
@@ -69,7 +71,7 @@ public class Transaction implements Comparable<Transaction> {
 
     /**
      * Sets the transaction date.
-     * 
+     *
      * @param date
      *            The transaction date as timestamp in milliseconds.
      */
@@ -79,7 +81,7 @@ public class Transaction implements Comparable<Transaction> {
 
     /**
      * Returns the stock's ticker symbol.
-     * 
+     *
      * @return The stock's ticker symbol.
      */
     public String getSymbol() {
@@ -88,7 +90,7 @@ public class Transaction implements Comparable<Transaction> {
 
     /**
      * Sets the stock's ticker symbol.
-     * 
+     *
      * @param symbol
      *            The stock's ticker symbol.
      */
@@ -98,7 +100,7 @@ public class Transaction implements Comparable<Transaction> {
 
     /**
      * Returns the transaction type.
-     * 
+     *
      * @return The transaction type.
      */
     public TransactionType getType() {
@@ -107,7 +109,7 @@ public class Transaction implements Comparable<Transaction> {
 
     /**
      * Sets the transaction type.
-     * 
+     *
      * @param type
      *            The transaction type.
      */
@@ -117,58 +119,58 @@ public class Transaction implements Comparable<Transaction> {
 
     /**
      * Returns the number of shares.
-     * 
+     *
      * @return The number of shares.
      */
-    public int getNoOfShares() {
+    public BigDecimal getNoOfShares() {
         return noOfShares;
     }
 
     /**
      * Sets the number of shares.
-     * 
+     *
      * @param noOfShares
      *            The number of shares.
      */
-    public void setNoOfShares(int noOfShares) {
+    public void setNoOfShares(BigDecimal noOfShares) {
         this.noOfShares = noOfShares;
     }
 
     /**
      * Returns the price per share.
-     * 
+     *
      * @return The price per share.
      */
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
     /**
      * Sets the price per share.
-     * 
+     *
      * @param price
      *            The price per share.
      */
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
     /**
      * Returns the transaction costs (e.g. brokerage fees; if any).
-     * 
+     *
      * @return The transaction costs.
      */
-    public double getCost() {
+    public BigDecimal getCost() {
         return cost;
     }
 
     /**
      * Sets the transaction costs (e.g. brokerage fees; if any).
-     * 
+     *
      * @param cost
      *            The transaction costs.
      */
-    public void setCost(double cost) {
+    public void setCost(BigDecimal cost) {
         this.cost = cost;
     }
 

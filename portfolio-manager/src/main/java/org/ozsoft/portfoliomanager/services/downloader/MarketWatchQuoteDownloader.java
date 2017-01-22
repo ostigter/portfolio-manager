@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@
 package org.ozsoft.portfoliomanager.services.downloader;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,9 +71,8 @@ public class MarketWatchQuoteDownloader extends QuoteDownloader {
 
             Matcher m = PATTERN.matcher(content);
             if (m.find()) {
-                double price = Double.parseDouble(m.group(1));
-                if (price != stock.getPrice()) {
-                    // double change = Double.parseDouble(m.group(2).replaceAll("\\s", "").replaceAll("N/A", "0.0"));
+                BigDecimal price = new BigDecimal(m.group(1));
+                if (!price.equals(stock.getPrice())) {
                     stock.setPrice(price);
                     stock.setChangePerc(Double.parseDouble(m.group(3).replaceAll("N/A", "0.0")));
                     stock.setPeRatio(Double.parseDouble(m.group(4).replaceAll("N/A", "-1.0")));

@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,6 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -57,7 +58,7 @@ import org.ozsoft.portfoliomanager.util.HttpPageReader;
 
 /**
  * Service to update and analyze stocks.
- * 
+ *
  * @author Oscar Stigter
  */
 public class UpdateService {
@@ -88,7 +89,7 @@ public class UpdateService {
 
     /**
      * Updates all stock data.
-     * 
+     *
      * @return The number of updated stocks.
      */
     public int updateAllStockData() {
@@ -99,7 +100,7 @@ public class UpdateService {
 
     /**
      * Updates the price of a single stock.
-     * 
+     *
      * @param stock
      *            The stock to update.
      * @return True if the stock was updated (price changed), otherwise false.
@@ -121,7 +122,7 @@ public class UpdateService {
 
     /**
      * Analyzes all stocks based on their historic performance and current valuation (price only).
-     * 
+     *
      * @return Message indicating the result of the analysis.
      */
     public String analyzeAllStocks() {
@@ -157,7 +158,7 @@ public class UpdateService {
 
     /**
      * Analyzes a single stock and prints the results to the console.
-     * 
+     *
      * @param stock
      *            The stock to analyze.
      */
@@ -179,10 +180,10 @@ public class UpdateService {
     /**
      * Updates all stocks based on the latest version of David Fish' CCC list (Excel sheet, updated monthly). <br />
      * <br />
-     * 
+     *
      * Checks for a newer version of the CCC list and updates the stocks only if present. <br />
      * <br />
-     * 
+     *
      * Uses the Apache POI framework to parse the Excel sheet.
      */
     private void updateStatistics() {
@@ -207,9 +208,10 @@ public class UpdateService {
                         if (cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING) {
                             String symbol = cell.getStringCellValue();
                             int yearsDivGrowth = (int) Math.floor(row.getCell(YEARS_GROWTH_COLUMN_INDEX).getNumericCellValue());
-                            double divRate = row.getCell(DIV_RATE_COLUMN_INDEX).getNumericCellValue();
+                            BigDecimal divRate = new BigDecimal(row.getCell(DIV_RATE_COLUMN_INDEX).getNumericCellValue());
                             cell = row.getCell(DIV_GROWTH_COLUMN_INDEX);
-                            double divGrowth = (cell != null && cell.getCellType() == Cell.CELL_TYPE_NUMERIC) ? cell.getNumericCellValue() : -1.0;
+                            BigDecimal divGrowth = (cell != null && cell.getCellType() == Cell.CELL_TYPE_NUMERIC)
+                                    ? new BigDecimal(cell.getNumericCellValue()) : new BigDecimal("-1.0");
 
                             Stock stock = config.getStock(symbol);
                             if (stock != null) {
@@ -233,7 +235,7 @@ public class UpdateService {
 
     /**
      * Downloads the latest version of David Fish' CCC list (Excel sheet).
-     * 
+     *
      * @param file
      *            The local CCC list file.
      */
@@ -258,7 +260,7 @@ public class UpdateService {
 
     /**
      * Updates all stock prices.
-     * 
+     *
      * @return The number of updated stocks.
      */
     private int updateAllPrices() {
@@ -270,7 +272,7 @@ public class UpdateService {
      * <br />
      * Every stock is updated by its own {@see StockUpdater} thread for maximum performance (less total duration, at the cost of a large CPU and
      * network I/O burst).
-     * 
+     *
      * @param stocks
      *            The stocks to update.
      * @return The number of updated stocks.
@@ -304,7 +306,7 @@ public class UpdateService {
 
     /**
      * Analyzes a stock based on its historic performance and current valuation (price only).
-     * 
+     *
      * @param stock
      *            The stock to analyze.
      * @return The stock analysis result.
@@ -327,7 +329,7 @@ public class UpdateService {
 
     /**
      * Retrieves the historic closing prices for a stock.
-     * 
+     *
      * @param stock
      *            The stock.
      * @return The historic closing prices.
@@ -347,7 +349,7 @@ public class UpdateService {
                     if (fields.length == 7) {
                         try {
                             Date date = DATE_FORMAT_SHORT.parse(fields[0]);
-                            double value = Double.parseDouble(fields[6]);
+                            BigDecimal value = new BigDecimal(fields[6]);
                             prices.add(new ClosingPrice(date, value));
                         } catch (ParseException e) {
                             LOGGER.error(String.format("Could not parse price quote: '%s'", line), e);

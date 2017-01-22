@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,6 @@
 package org.ozsoft.portfoliomanager.ui.table.column;
 
 import java.awt.Color;
-
 import org.ozsoft.datatable.DefaultColumnRenderer;
 
 /**
@@ -44,14 +43,14 @@ public class TPIColumnRenderer extends DefaultColumnRenderer {
                 if (indexValue >= 100.0) {
                     // Target price reached
                     backgroundColor = Color.GREEN;
-                } else if (indexValue >= 90.0) {
-                    // Approaching target price
+                } else if (indexValue >= 95.0) {
+                    // Approaching target price (within 5 %)
                     backgroundColor = Color.YELLOW;
                 } else {
-                    // Distant from target price
+                    // Far from target price
                     backgroundColor = null;
                 }
-                return String.format("%.1f", (double) value);
+                return String.format("%.1f", indexValue);
             }
         } else {
             backgroundColor = null;

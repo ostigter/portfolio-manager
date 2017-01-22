@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,7 @@
 
 package org.ozsoft.portfoliomanager.ui.table.column;
 
-import java.awt.Color;
+import java.math.BigDecimal;
 
 import org.ozsoft.datatable.DefaultColumnRenderer;
 
@@ -31,31 +31,18 @@ public class DRColumnRenderer extends DefaultColumnRenderer {
 
     private static final long serialVersionUID = -8744524110427922656L;
 
-    private Color backgroundColor;
-
     @Override
     public String formatValue(Object value) {
-        if (value instanceof Double) {
-            double numericValue = (double) value;
-            if (numericValue > 0.0) {
-                backgroundColor = null;
+        if (value instanceof BigDecimal) {
+            BigDecimal numericValue = (BigDecimal) value;
+            if (numericValue.signum() > 0) {
                 return String.format("$ %.2f", numericValue);
             } else {
-                backgroundColor = Color.YELLOW;
-                return "N/A";
+                // Empty when no dividend.
+                return null;
             }
         } else {
-            backgroundColor = Color.WHITE;
-            return null;
-        }
-    }
-
-    @Override
-    public Color getBackground() {
-        if (backgroundColor != null) {
-            return backgroundColor;
-        } else {
-            return super.getBackground();
+            return "<ERROR>";
         }
     }
 }

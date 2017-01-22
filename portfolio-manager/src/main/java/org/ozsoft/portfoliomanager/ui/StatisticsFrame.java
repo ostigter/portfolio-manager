@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,6 +40,7 @@ import org.ozsoft.portfoliomanager.domain.Configuration;
 import org.ozsoft.portfoliomanager.domain.Portfolio;
 import org.ozsoft.portfoliomanager.domain.Results;
 import org.ozsoft.portfoliomanager.domain.Transaction;
+import org.ozsoft.portfoliomanager.util.MathUtils;
 
 /**
  * Modal window to view portfolio statistics.
@@ -50,6 +53,8 @@ public class StatisticsFrame extends JDialog {
 
     private static final String[] MONTHS = { null, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
             "November", "December" };
+
+    private static final int PERIOD_WIDTH = 24;
 
     private JTextArea textArea;
 
@@ -101,10 +106,10 @@ public class StatisticsFrame extends JDialog {
 
         int daysInMonth = 1;
         int totalDays = 1;
-        double currentCost = 0.0;
-        Map<Integer, Double> costPerDay = new TreeMap<Integer, Double>();
-        Map<Integer, Double> overallCosts = new TreeMap<Integer, Double>();
-        Map<String, Double> costPerStock = new HashMap<String, Double>();
+        BigDecimal currentCost = BigDecimal.ZERO;
+        Map<Integer, BigDecimal> costPerDay = new TreeMap<Integer, BigDecimal>();
+        Map<Integer, BigDecimal> overallCosts = new TreeMap<Integer, BigDecimal>();
+        Map<String, BigDecimal> costPerStock = new HashMap<String, BigDecimal>();
         Map<String, Integer> sharesPerStock = new HashMap<String, Integer>();
 
         Calendar day = firstDay;
@@ -119,40 +124,39 @@ public class StatisticsFrame extends JDialog {
                 String symbol = tx.getSymbol();
                 switch (tx.getType()) {
                     case DIVIDEND:
-                        double income = tx.getNoOfShares() * tx.getPrice();
-                        income -= tx.getCost();
+                        BigDecimal income = tx.getNoOfShares().multiply(tx.getPrice()).subtract(tx.getCost());
                         monthlyResult.addIncome(income);
                         quarterlyResult.addIncome(income);
                         annualResult.addIncome(income);
                         totalResult.addIncome(income);
                         break;
                     case BUY:
-                        double costs = tx.getNoOfShares() * tx.getPrice() + tx.getCost();
-                        Double cps = costPerStock.get(symbol);
+                        BigDecimal costs = tx.getNoOfShares().multiply(tx.getPrice()).add(tx.getCost());
+                        BigDecimal cps = costPerStock.get(symbol);
                         if (cps == null) {
                             costPerStock.put(symbol, costs);
                         } else {
-                            costPerStock.put(symbol, cps + costs);
+                            costPerStock.put(symbol, cps.add(costs));
                         }
                         Integer sps = sharesPerStock.get(symbol);
                         if (sps == null) {
-                            sharesPerStock.put(symbol, tx.getNoOfShares());
+                            sharesPerStock.put(symbol, tx.getNoOfShares().intValue());
                         } else {
-                            sharesPerStock.put(symbol, sps + tx.getNoOfShares());
+                            sharesPerStock.put(symbol, sps + tx.getNoOfShares().intValue());
                         }
-                        Double dayCosts = costPerDay.get(daysInMonth);
+                        BigDecimal dayCosts = costPerDay.get(daysInMonth);
                         if (dayCosts == null) {
                             costPerDay.put(daysInMonth, costs);
                         } else {
-                            costPerDay.put(daysInMonth, dayCosts + costs);
+                            costPerDay.put(daysInMonth, dayCosts.add(costs));
                         }
-                        Double dayCosts2 = overallCosts.get(totalDays);
+                        BigDecimal dayCosts2 = overallCosts.get(totalDays);
                         if (dayCosts2 == null) {
                             overallCosts.put(totalDays, costs);
                         } else {
-                            overallCosts.put(totalDays, dayCosts2 + costs);
+                            overallCosts.put(totalDays, dayCosts2.add(costs));
                         }
-                        currentCost += costs;
+                        currentCost = currentCost.add(costs);
                         monthlyResult.addCosts(costs);
                         quarterlyResult.addCosts(costs);
                         annualResult.addCosts(costs);
@@ -161,42 +165,40 @@ public class StatisticsFrame extends JDialog {
                     case SELL:
                         cps = costPerStock.get(symbol);
                         sps = sharesPerStock.get(symbol);
-                        double avgPrice = 0.0;
+                        BigDecimal avgPrice;
                         if (cps != null && sps != null && sps > 0) {
-                            avgPrice = cps / sps;
+                            avgPrice = cps.divide(new BigDecimal(sps), MathContext.DECIMAL64);
                         } else {
-                            throw new IllegalStateException(String.format("Invalid SELL transaction for stock '%s': non-existing position",
-                                    symbol));
+                            throw new IllegalStateException(String.format("Invalid SELL transaction for stock '%s': non-existing position", symbol));
                         }
-                        costs = tx.getNoOfShares() * avgPrice;
+                        costs = tx.getNoOfShares().multiply(avgPrice);
                         dayCosts = costPerDay.get(daysInMonth);
                         if (dayCosts == null) {
-                            costPerDay.put(daysInMonth, -costs);
+                            costPerDay.put(daysInMonth, MathUtils.negate(costs));
                         } else {
-                            costPerDay.put(daysInMonth, dayCosts - costs);
+                            costPerDay.put(daysInMonth, dayCosts.subtract(costs));
                         }
                         dayCosts2 = overallCosts.get(totalDays);
                         if (dayCosts2 == null) {
-                            overallCosts.put(totalDays, -costs);
+                            overallCosts.put(totalDays, MathUtils.negate(costs));
                         } else {
-                            overallCosts.put(totalDays, dayCosts2 - costs);
+                            overallCosts.put(totalDays, dayCosts2.subtract(costs));
                         }
-                        costPerStock.put(symbol, cps - costs);
-                        sharesPerStock.put(symbol, sps - tx.getNoOfShares());
-                        currentCost -= costs + tx.getCost();
+                        costPerStock.put(symbol, cps.subtract(costs));
+                        sharesPerStock.put(symbol, sps - tx.getNoOfShares().intValue());
+                        currentCost = currentCost.subtract(costs).subtract(tx.getCost());
                         break;
                 }
             } else {
                 totalDays++;
                 day.add(Calendar.DAY_OF_YEAR, 1);
                 if (1 + day.get(Calendar.MONTH) != month) {
-                    double sum = 0.0;
+                    BigDecimal sum = BigDecimal.ZERO;
                     for (Integer dayNr : costPerDay.keySet()) {
-                        // textArea.append(String.format("Day %02d-%02d-%04d:\t\tCost: $%,.0f\n", dayNr, month, year, costPerDay.get(dayNr)));
-                        sum += costPerDay.get(dayNr);
+                        sum = sum.add(costPerDay.get(dayNr));
                     }
-                    double avgCost = sum / daysInMonth;
-                    textArea.append(String.format("%s, %d:\t\tAverage Costbase: $%,.0f, Income: $%,.0f\n", MONTHS[month], year, avgCost,
+                    BigDecimal avgCost = sum.divide(new BigDecimal(daysInMonth), MathContext.DECIMAL64);
+                    textArea.append(String.format("%sAverage Costbase: $%,.0f, Income: $%,.0f\n", formatPeriod(month, year), avgCost,
                             monthlyResult.getIncome()));
                     monthlyResult.clear();
                     month = 1 + day.get(Calendar.MONTH);
@@ -223,27 +225,27 @@ public class StatisticsFrame extends JDialog {
         }
 
         textArea.append(
-                String.format("%s, %d:\t\tAverage Costbase: $%,.0f, Income: $%,.0f\n", MONTHS[month], year, currentCost, monthlyResult
-                        .getIncome()));
+                String.format("%sAverage Costbase: $%,.0f, Income: $%,.0f\n", formatPeriod(month, year), currentCost, monthlyResult.getIncome()));
         textArea.append(String.format("\nQuarter %d, %d:\tAverage Costbase: $%,.0f, Income: $%,.0f\n", quarter, year, currentCost,
                 quarterlyResult.getIncome()));
         textArea.append(String.format("\n%d:\t\t\tAverage Costbase: $%,.0f, Income: $%,.0f\n", year, currentCost, annualResult.getIncome()));
 
-        double sum = 0.0;
+        BigDecimal sum = BigDecimal.ZERO;
         for (Integer dayNr : overallCosts.keySet()) {
             // textArea.append(String.format("Day %04d:\t\tCostbase: $%,.0f\n", dayNr, overallCosts.get(dayNr)));
-            sum += overallCosts.get(dayNr);
+            sum = sum.add(overallCosts.get(dayNr));
         }
         double years = totalDays / 365.0;
         if (years < 1.0) {
             years = 1.0; // to not extrapolate CAGR for less than a year
         }
-        double avgCost = sum / totalDays;
+        BigDecimal avgCost = sum.divide(new BigDecimal(totalDays), MathContext.DECIMAL64);
         Portfolio portfolio = config.getPortfolio();
-        double totalReturn = portfolio.getTotalReturn();
-        double totalReturnCAGR = (Math.pow(totalReturn / avgCost + 1.0, 1.0 / years) - 1.0) * 100.0;
-        textArea.append(String.format("\nOverall:\t\tAverage Costbase: $%,.0f, Income: $%,.0f, Total Return: $%,.0f (%.2f %% CAGR)\n",
-                avgCost, portfolio.getTotalIncome(), totalReturn, totalReturnCAGR));
+        BigDecimal totalReturn = portfolio.getTotalReturn();
+        double totalReturnCAGR = (Math.pow(totalReturn.divide(avgCost, MathContext.DECIMAL64).add(BigDecimal.ONE).doubleValue(), 1.0 / years) - 1.0)
+                * 100.0;
+        textArea.append(String.format("\nOverall:\t\tAverage Costbase: $%,.0f, Income: $%,.0f, Total Return: $%,.0f (%.2f %% CAGR)\n", avgCost,
+                portfolio.getTotalIncome(), totalReturn, totalReturnCAGR));
     }
 
     /**
@@ -281,5 +283,14 @@ public class StatisticsFrame extends JDialog {
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         return cal;
+    }
+
+    private static String formatPeriod(int month, int year) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%s, %d:", MONTHS[month], year));
+        while (sb.length() < PERIOD_WIDTH) {
+            sb.append(' ');
+        }
+        return sb.toString();
     }
 }

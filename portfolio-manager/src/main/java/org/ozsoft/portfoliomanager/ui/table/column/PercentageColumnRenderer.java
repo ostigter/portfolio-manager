@@ -8,7 +8,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,8 @@
 // limitations under the License.
 
 package org.ozsoft.portfoliomanager.ui.table.column;
+
+import java.math.BigDecimal;
 
 import org.ozsoft.datatable.DefaultColumnRenderer;
 
@@ -36,9 +38,17 @@ public class PercentageColumnRenderer extends DefaultColumnRenderer {
             if (percValue == 0.0) {
                 return null;
             } else {
-                return String.format("%.2f %%", (double) value);
+                return String.format("%.2f %%", percValue);
+            }
+        } else if (value instanceof BigDecimal) {
+            BigDecimal percValue = (BigDecimal) value;
+            if (percValue.signum() == 0) {
+                return null;
+            } else {
+                return String.format("%.2f %%", percValue);
             }
         } else {
+            // Empty value, e.g. in footer row.
             return null;
         }
     }
