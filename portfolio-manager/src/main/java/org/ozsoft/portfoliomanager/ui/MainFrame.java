@@ -39,6 +39,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ozsoft.datatable.DataTable;
 import org.ozsoft.portfoliomanager.domain.Configuration;
+import org.ozsoft.portfoliomanager.services.AnalyzeService;
 import org.ozsoft.portfoliomanager.services.UpdateService;
 import org.ozsoft.portfoliomanager.ui.table.BenchTable;
 import org.ozsoft.portfoliomanager.ui.table.GoalTable;
@@ -65,6 +66,8 @@ public class MainFrame extends JFrame {
     private final Configuration config;
 
     private final UpdateService updateService = new UpdateService();
+
+    private final AnalyzeService analyzeService = new AnalyzeService();
 
     private JTabbedPane tabbedPane;
 
@@ -265,7 +268,7 @@ public class MainFrame extends JFrame {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    String resultMessage = updateService.analyzeAllStocks();
+                    String resultMessage = analyzeService.analyzeAllStocks();
                     closeMessageDialog();
                     setStatus(resultMessage);
                 }

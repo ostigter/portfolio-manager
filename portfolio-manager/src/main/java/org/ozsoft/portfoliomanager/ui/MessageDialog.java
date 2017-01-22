@@ -19,6 +19,7 @@
 package org.ozsoft.portfoliomanager.ui;
 
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -38,20 +39,20 @@ public class MessageDialog extends JDialog {
 
     private static final long serialVersionUID = -70419363927208237L;
 
-    private final MainFrame mainFrame;
+    private final Frame parent;
 
     private final JLabel messageLabel;
 
     /**
      * Constructor.
      *
-     * @param mainFrame
+     * @param parent
      *            The application's main window.
      */
-    public MessageDialog(MainFrame mainFrame) {
-        super(mainFrame, false);
+    public MessageDialog(Frame parent) {
+        super(parent, false);
 
-        this.mainFrame = mainFrame;
+        this.parent = parent;
 
         setUndecorated(true);
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -83,7 +84,7 @@ public class MessageDialog extends JDialog {
     public void show(String message) {
         if (!isVisible()) {
             messageLabel.setText(message);
-            setLocationRelativeTo(mainFrame);
+            setLocationRelativeTo(parent);
             setVisible(true);
         }
     }

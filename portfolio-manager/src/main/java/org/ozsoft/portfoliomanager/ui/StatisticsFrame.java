@@ -56,7 +56,7 @@ public class StatisticsFrame extends JDialog {
 
     private static final int PERIOD_WIDTH = 24;
 
-    private JTextArea textArea;
+    private final JTextArea textArea;
 
     /**
      * Constructor.

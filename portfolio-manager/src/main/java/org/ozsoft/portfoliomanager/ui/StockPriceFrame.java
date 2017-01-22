@@ -65,31 +65,17 @@ public class StockPriceFrame extends JFrame {
     private final ImagePanel sevenDaysGraphPanel;
 
     /**
-     * Shows the window for the specified stock.
-     *
-     * @param stock
-     *            The stock.
-     */
-    public static void show(Stock stock) {
-        JFrame frame = new StockPriceFrame(stock);
-        frame.setResizable(false);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    }
-
-    /**
      * Private constructor.
      *
      * @param stock
      *            The stock to show the price and graphs for.
      */
     private StockPriceFrame(Stock stock) {
-        super(stock.getSymbol() + " - Stock price");
+        super(stock.getSymbol() + " - Price");
 
         this.stock = stock;
 
         httpPageReader = new HttpPageReader();
-
         updateService = new UpdateService();
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -176,6 +162,19 @@ public class StockPriceFrame extends JFrame {
     }
 
     /**
+     * Shows the window for the specified stock.
+     *
+     * @param stock
+     *            The stock.
+     */
+    public static void show(Stock stock) {
+        JFrame frame = new StockPriceFrame(stock);
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    /**
      * Updates the stock's current price and graphs.
      */
     private void update() {
@@ -202,6 +201,6 @@ public class StockPriceFrame extends JFrame {
     }
 
     private void analyze() {
-        updateService.printStockAnalysis(stock);
+        new StockAnalysisFrame(stock);
     }
 }

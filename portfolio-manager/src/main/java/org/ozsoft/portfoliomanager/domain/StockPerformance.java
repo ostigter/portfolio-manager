@@ -34,9 +34,7 @@ import org.ozsoft.portfoliomanager.util.MathUtils;
  */
 public class StockPerformance {
 
-    private final List<ClosingPrice> prices;
-
-    private final int duration;
+    private static final double MILLISECONDS_PER_YEAR = 365.0 * 24.0 * 60.0 * 60.0 * 1000.0;
 
     private BigDecimal startPrice;
 
@@ -52,30 +50,41 @@ public class StockPerformance {
 
     private BigDecimal volatility;
 
-    public StockPerformance(List<ClosingPrice> prices, TimeRange dateFilter) {
-        this.prices = new ArrayList<ClosingPrice>();
-        this.duration = dateFilter.getDuration();
+    private BigDecimal totalDividends;
 
+    private double years;
+
+    public StockPerformance(List<ClosingPrice> allPrices, List<ClosingPrice> dividends, TimeRange dateFilter) {
+        // Find closing prices during specified period.
+        List<ClosingPrice> prices = new ArrayList<ClosingPrice>();
         Date fromDate = dateFilter.getFromDate();
-        for (ClosingPrice price : prices) {
+        for (ClosingPrice price : allPrices) {
             if (price.getDate().after(fromDate)) {
-                this.prices.add(price);
+                prices.add(price);
+            }
+        }
+        Collections.sort(prices);
+
+        // Calculate total amount of received dividend payments during period.
+        totalDividends = BigDecimal.ZERO;
+        for (ClosingPrice payment : dividends) {
+            if (payment.getDate().after(fromDate)) {
+                totalDividends = totalDividends.add(payment.getValue());
             }
         }
 
-        Collections.sort(this.prices);
-
-        int count = this.prices.size();
-        startPrice = this.prices.get(0).getValue();
-        endPrice = this.prices.get(count - 1).getValue();
+        // Calculate price statisics.
+        int count = prices.size();
+        startPrice = prices.get(0).getValue();
+        endPrice = prices.get(count - 1).getValue();
         lowPrice = new BigDecimal(99999);
         highPrice = BigDecimal.ZERO;
         change = endPrice.subtract(startPrice);
         changePerc = MathUtils.perc(change, startPrice);
+        volatility = BigDecimal.ZERO;
         BigDecimal slope = change.divide(new BigDecimal(count), MathContext.DECIMAL64);
-
         for (int i = 0; i < count; i++) {
-            BigDecimal p = this.prices.get(i).getValue();
+            BigDecimal p = prices.get(i).getValue();
             if (p.compareTo(lowPrice) < 0) {
                 lowPrice = p;
             }
@@ -83,14 +92,14 @@ public class StockPerformance {
                 highPrice = p;
             }
             BigDecimal avg = startPrice.add(new BigDecimal(i).multiply(slope));
-
             volatility = volatility.add(MathUtils.abs(p, avg).divide(p, MathContext.DECIMAL64).multiply(MathUtils.HUNDRED));
         }
         volatility = volatility.divide(new BigDecimal(count), MathContext.DECIMAL64);
-    }
 
-    public List<ClosingPrice> getPrices() {
-        return Collections.unmodifiableList(prices);
+        // Determine actual duration based on the stock's history.
+        Date firstDate = prices.get(0).getDate();
+        Date lastDate = prices.get(count - 1).getDate();
+        years = (lastDate.getTime() - firstDate.getTime()) / MILLISECONDS_PER_YEAR;
     }
 
     public double getStartPrice() {
@@ -122,10 +131,10 @@ public class StockPerformance {
     }
 
     public double getCagr() {
-        if (duration < 1) {
-            return changePerc.doubleValue();
+        if (years < 1.0) {
+            return endPrice.add(totalDividends).divide(startPrice, MathContext.DECIMAL64).doubleValue();
         } else {
-            return (Math.pow(endPrice.divide(startPrice, MathContext.DECIMAL64).doubleValue(), 1.0 / duration) - 1.0) * 100.0;
+            return (Math.pow(endPrice.add(totalDividends).divide(startPrice, MathContext.DECIMAL64).doubleValue(), 1.0 / years) - 1.0) * 100.0;
         }
     }
 
