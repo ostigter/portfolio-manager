@@ -8,8 +8,8 @@ Introduction
 Portfolio Manager is a desktop application to track stocks and manage your portfolio, especially
 designed for value and dividend growth investing styles based on the U.S. market.
 
-Real-time and historic stock prices are retrieved from Yahoo Finance, while other stock data is
-retrieved from Morningstar and David Fish' CCC list.
+Real-time and historic stock prices are retrieved from MarketWatch and Yahoo Finance, while other
+stock data is retrieved from Morningstar and David Fish' CCC list.
 
 
 Development
