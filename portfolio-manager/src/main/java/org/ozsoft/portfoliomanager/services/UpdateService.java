@@ -130,11 +130,10 @@ public class UpdateService {
                         if (cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING) {
                             String symbol = cell.getStringCellValue();
                             int yearsDivGrowth = (int) Math.floor(row.getCell(YEARS_GROWTH_COLUMN_INDEX).getNumericCellValue());
-                            BigDecimal divRate = new BigDecimal(row.getCell(DIV_RATE_COLUMN_INDEX).getNumericCellValue());
+                            BigDecimal divRate = new BigDecimal(row.getCell(DIV_RATE_COLUMN_INDEX).toString());
                             cell = row.getCell(DIV_GROWTH_COLUMN_INDEX);
-                            BigDecimal divGrowth = (cell != null && cell.getCellType() == Cell.CELL_TYPE_NUMERIC)
-                                    ? new BigDecimal(cell.getNumericCellValue()) : new BigDecimal("-1.0");
-
+                            BigDecimal divGrowth = (cell != null && cell.getCellType() == Cell.CELL_TYPE_NUMERIC) ? new BigDecimal(cell.toString())
+                                    : new BigDecimal("-1.0");
                             Stock stock = config.getStock(symbol);
                             if (stock != null) {
                                 stock.setYearsDivGrowth(yearsDivGrowth);
