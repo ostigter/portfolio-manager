@@ -18,9 +18,6 @@
 
 package org.ozsoft.portfoliomanager;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import javax.swing.SwingUtilities;
 
 import org.apache.logging.log4j.LogManager;
@@ -31,8 +28,6 @@ public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
-
     public static void main(String[] args) {
         LOGGER.debug("Starting application");
         SwingUtilities.invokeLater(new Runnable() {
@@ -42,5 +37,10 @@ public class Main {
                 LOGGER.info("Application started");
             }
         });
+
+        // Configuration config = Configuration.getInstance();
+        // UpdateService updateService = new UpdateService();
+        // Stock stock = config.getStock("ROBO");
+        // updateService.updatePrice(stock);
     }
 }

@@ -1,8 +1,11 @@
 Portfolio Manager - TODO
 ========================
 
+* Fix MarketWatch downloader for funds/ETFs
+* Support after-hours and pre-market prices from MarketWatch
+* Retrieve current dividend rate from MarketWatch iso CCC list
+* Retrieve dividend growth data from Yahoo Finance iso CCC list
 * Portfolio result graphs
-* Correctly handle price change percentage outside market hours
 * View application log
 * Configuration dialog
 * Alert log

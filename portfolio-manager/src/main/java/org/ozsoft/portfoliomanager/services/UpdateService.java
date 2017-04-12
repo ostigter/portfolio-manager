@@ -203,9 +203,12 @@ public class UpdateService {
 
         Set<StockUpdater> updaters = new HashSet<StockUpdater>();
         for (Stock stock : stocks) {
-            StockUpdater updater = new StockUpdater(stock, httpPageReader);
-            updaters.add(updater);
-            updater.start();
+            // FIXME: Skip ETFs (broken)
+            if (!stock.getSymbol().equals("ROBO")) {
+                StockUpdater updater = new StockUpdater(stock, httpPageReader);
+                updaters.add(updater);
+                updater.start();
+            }
         }
 
         int updatedCount = 0;

@@ -154,7 +154,7 @@ public class AnalyzeService {
      *
      * @return The historic dividends.
      */
-    private List<ClosingPrice> getDividends(Stock stock) {
+    public List<ClosingPrice> getDividends(Stock stock) {
         String symbol = stock.getSymbol();
         String uri = String.format(HISTORICAL_DIVIDENDS_URL, symbol);
         List<ClosingPrice> prices = new ArrayList<ClosingPrice>();
