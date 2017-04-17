@@ -41,11 +41,16 @@ public class MarketWatchQuoteDownloader extends QuoteDownloader {
     // private static final String URI = "http://www.marketwatch.com/m/quote/%s";
     private static final String URI = "http://www.marketwatch.com/investing/stock/%s";
 
-    // FIXME: Update funds/ETFs (broken)
+    private static final Pattern TYPE_PATTERN = Pattern.compile("<meta name=\"instrumentType\" content=\"(.*?)\">");
+
     // TODO: Support after-hours and pre-market prices
     // TODO: Retrieve dividend rate from MarketWatch iso CCC list
-    private static final Pattern PATTERN = Pattern.compile(
+    private static final Pattern STOCK_PATTERN = Pattern.compile(
             "<meta name=\"exchange\" content=\"(.*?)\">.*<meta name=\"price\" content=\"(.*?)\">.*<meta name=\"priceChangePercent\" content=\"(.*?)%\">.*<small class=\"kv__label\">P/E Ratio</small>\\s*<span class=\"kv__value kv__primary .*?\">(.*?)</span>",
+            Pattern.DOTALL);
+
+    private static final Pattern ETF_PATTERN = Pattern.compile(
+            "<meta name=\"exchange\" content=\"(.*?)\">.*<meta name=\"price\" content=\"(.*?)\">.*<meta name=\"priceChangePercent\" content=\"(.*?)%\">",
             Pattern.DOTALL);
 
     private static final Logger LOGGER = LogManager.getLogger(MarketWatchQuoteDownloader.class);
@@ -63,38 +68,69 @@ public class MarketWatchQuoteDownloader extends QuoteDownloader {
     @Override
     public boolean updateStock(Stock stock) {
         boolean isUpdated = false;
+        // long startTime;
+        // long duration;
 
         try {
-            // LOGGER.debug("Requesting stock quote for " + stock);
-            // long startTime = System.currentTimeMillis();
+            // LOGGER.debug("Requesting quote for " + stock);
+            // startTime = System.currentTimeMillis();
             String symbol = stock.getSymbol().replace('-', '.');
             String content = httpPageReader.read(String.format(URI, symbol)).trim();
-            // long duration = System.currentTimeMillis() - startTime;
-            // LOGGER.debug(String.format("Received stock quote for %s (%,.0f kB) in %,d ms", stock, content.length() / 1024.0, duration));
+            // duration = System.currentTimeMillis() - startTime;
+            // LOGGER.debug(String.format("Received quote for %s (%,.0f kB) in %,d ms", stock, content.length() / 1024.0, duration));
 
-            // LOGGER.debug("Parsing stock quote for " + stock);
-            // startTime = System.currentTimeMillis();
-            Matcher m = PATTERN.matcher(content);
+            // Determine instrument type.
+            Matcher m = TYPE_PATTERN.matcher(content);
             if (m.find()) {
-                BigDecimal price = new BigDecimal(m.group(2));
-                if (!price.equals(stock.getPrice())) {
-                    stock.setPrice(price);
-                    stock.setChangePerc(Double.parseDouble(m.group(3).replaceAll("n/a", "0.0")));
-                    stock.setPeRatio(Double.parseDouble(m.group(4).replaceAll("n/a", "-1.0")));
-                    // String exchange = m.group(1);
-                    // double yield = Double.parseDouble(m.group(5).replaceAll("n/a", "0.0"));
-                    // double divRate = Double.parseDouble(m.group(6).replaceAll("n/a", "0.0"));
-                    isUpdated = true;
-                    // duration = System.currentTimeMillis() - startTime;
-                    // LOGGER.debug(String.format("Parsed stock quote for %s (%,.0f kB) in %,d ms", stock, content.length() / 1024.0, duration));
-                    // LOGGER.debug("Updated stock price of " + stock);
+                String type = m.group(1);
+                if (type.equals("Stock")) {
+                    // Common or preferred stock.
+                    // LOGGER.debug("Parsing quote for " + stock);
+                    // startTime = System.currentTimeMillis();
+                    m = STOCK_PATTERN.matcher(content);
+                    if (m.find()) {
+                        BigDecimal price = new BigDecimal(m.group(2));
+                        if (!price.equals(stock.getPrice())) {
+                            stock.setPrice(price);
+                            stock.setChangePerc(Double.parseDouble(m.group(3).replaceAll("n/a", "0.0")));
+                            stock.setPeRatio(Double.parseDouble(m.group(4).replaceAll("n/a", "-1.0")));
+                            // String exchange = m.group(1);
+                            // double yield = Double.parseDouble(m.group(5).replaceAll("n/a", "0.0"));
+                            // double divRate = Double.parseDouble(m.group(6).replaceAll("n/a", "0.0"));
+                            isUpdated = true;
+                            // duration = System.currentTimeMillis() - startTime;
+                            // LOGGER.debug(String.format("Parsed quote for %s (%,.0f kB) in %,d ms", stock, content.length() / 1024.0, duration));
+                            // LOGGER.debug("Updated price of " + stock);
+                        }
+                    } else {
+                        LOGGER.error("Failed to parse quote for stock " + stock);
+                        // System.out.println(content);
+                    }
+                } else {
+                    // ETF or fund.
+                    // LOGGER.debug("Parsing quote for " + stock);
+                    // startTime = System.currentTimeMillis();
+                    m = ETF_PATTERN.matcher(content);
+                    if (m.find()) {
+                        BigDecimal price = new BigDecimal(m.group(2));
+                        if (!price.equals(stock.getPrice())) {
+                            stock.setPrice(price);
+                            stock.setChangePerc(Double.parseDouble(m.group(3).replaceAll("n/a", "0.0")));
+                            stock.setPeRatio(-1.0);
+                            isUpdated = true;
+                            // duration = System.currentTimeMillis() - startTime;
+                            // LOGGER.debug(String.format("Parsed quote for %s (%,.0f kB) in %,d ms", stock, content.length() / 1024.0, duration));
+                            // LOGGER.debug("Updated price of " + stock);
+                        }
+                    } else {
+                        LOGGER.error("Failed to parse quote for ETF/fund " + stock);
+                        // System.out.println(content);
+                    }
                 }
-            } else {
-                LOGGER.error("Failed to parse stock quote for " + stock);
-                // System.out.println(content);
             }
+
         } catch (IOException e) {
-            LOGGER.error(String.format("Failed to retrieve stock quote for %s: %s", stock, e.getMessage()));
+            LOGGER.error(String.format("Failed to retrieve quote for %s: %s", stock, e.getMessage()));
         }
 
         return isUpdated;
