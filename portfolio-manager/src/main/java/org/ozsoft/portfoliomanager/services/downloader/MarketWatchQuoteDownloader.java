@@ -53,6 +53,9 @@ public class MarketWatchQuoteDownloader extends QuoteDownloader {
             "<meta name=\"exchange\" content=\"(.*?)\">.*<meta name=\"price\" content=\"(.*?)\">.*<meta name=\"priceChangePercent\" content=\"(.*?)%\">",
             Pattern.DOTALL);
 
+    private static final Pattern AFTER_HOURS_PATTERN = Pattern
+            .compile("<div class=\".* element--intraday\">.*<bg-quote class=\"value\".*?>(.*?)</bg-quote>", Pattern.DOTALL);
+
     private static final Logger LOGGER = LogManager.getLogger(MarketWatchQuoteDownloader.class);
 
     /**
@@ -79,6 +82,10 @@ public class MarketWatchQuoteDownloader extends QuoteDownloader {
             // duration = System.currentTimeMillis() - startTime;
             // LOGGER.debug(String.format("Received quote for %s (%,.0f kB) in %,d ms", stock, content.length() / 1024.0, duration));
 
+            BigDecimal price = BigDecimal.ZERO;
+            double priceChangePerc = 0.0;
+            double peRatio = -1.0;
+
             // Determine instrument type.
             Matcher m = TYPE_PATTERN.matcher(content);
             if (m.find()) {
@@ -89,14 +96,31 @@ public class MarketWatchQuoteDownloader extends QuoteDownloader {
                     // startTime = System.currentTimeMillis();
                     m = STOCK_PATTERN.matcher(content);
                     if (m.find()) {
-                        BigDecimal price = new BigDecimal(m.group(2));
+                        // String exchange = m.group(1);
+                        price = new BigDecimal(m.group(2));
+                        priceChangePerc = Double.parseDouble(m.group(3).replaceAll("n/a", "0.0"));
+                        peRatio = Double.parseDouble(m.group(4).replaceAll("n/a", "-1.0"));
+                        // double yield = Double.parseDouble(m.group(5).replaceAll("n/a", "0.0"));
+                        // double divRate = Double.parseDouble(m.group(6).replaceAll("n/a", "0.0"));
+
+                        double pricePrevious = (1.0 / (1.0 + priceChangePerc / 100.0)) * price.doubleValue();
+                        // System.out.format("### Previous: $ %.2f\n", pricePrevious);
+                        // System.out.format("### Close: $ %.2f\n", price);
+                        // System.out.format("### Change: %.2f %%\n", priceChangePerc);
+
+                        // Look for pre-market or after-hours price
+                        m = AFTER_HOURS_PATTERN.matcher(content);
+                        if (m.find()) {
+                            price = new BigDecimal(m.group(1));
+                            // System.out.format("### After-hours: $ %.2f\n", price);
+                            priceChangePerc = (price.doubleValue() - pricePrevious) / pricePrevious * 100.0;
+                            // System.out.format("### Price change: %.2f %%\n", priceChangePerc);
+                        }
+
                         if (!price.equals(stock.getPrice())) {
                             stock.setPrice(price);
-                            stock.setChangePerc(Double.parseDouble(m.group(3).replaceAll("n/a", "0.0")));
-                            stock.setPeRatio(Double.parseDouble(m.group(4).replaceAll("n/a", "-1.0")));
-                            // String exchange = m.group(1);
-                            // double yield = Double.parseDouble(m.group(5).replaceAll("n/a", "0.0"));
-                            // double divRate = Double.parseDouble(m.group(6).replaceAll("n/a", "0.0"));
+                            stock.setChangePerc(priceChangePerc);
+                            stock.setPeRatio(peRatio);
                             isUpdated = true;
                             // duration = System.currentTimeMillis() - startTime;
                             // LOGGER.debug(String.format("Parsed quote for %s (%,.0f kB) in %,d ms", stock, content.length() / 1024.0, duration));
@@ -112,10 +136,29 @@ public class MarketWatchQuoteDownloader extends QuoteDownloader {
                     // startTime = System.currentTimeMillis();
                     m = ETF_PATTERN.matcher(content);
                     if (m.find()) {
-                        BigDecimal price = new BigDecimal(m.group(2));
+                        // String exchange = m.group(1);
+                        price = new BigDecimal(m.group(2));
+                        priceChangePerc = Double.parseDouble(m.group(3).replaceAll("n/a", "0.0"));
+                        // double yield = Double.parseDouble(m.group(5).replaceAll("n/a", "0.0"));
+                        // double divRate = Double.parseDouble(m.group(6).replaceAll("n/a", "0.0"));
+
+                        double pricePrevious = (1.0 / (1.0 + priceChangePerc / 100.0)) * price.doubleValue();
+                        // System.out.format("### Previous: $ %.2f\n", pricePrevious);
+                        // System.out.format("### Close: $ %.2f\n", price);
+                        // System.out.format("### Change: %.2f %%\n", priceChangePerc);
+
+                        // Look for pre-market or after-hours price
+                        m = AFTER_HOURS_PATTERN.matcher(content);
+                        if (m.find()) {
+                            price = new BigDecimal(m.group(1));
+                            // System.out.format("### After-hours: $ %.2f\n", price);
+                            priceChangePerc = (price.doubleValue() - pricePrevious) / pricePrevious * 100.0;
+                            // System.out.format("### Price change: %.2f %%\n", priceChangePerc);
+                        }
+
                         if (!price.equals(stock.getPrice())) {
                             stock.setPrice(price);
-                            stock.setChangePerc(Double.parseDouble(m.group(3).replaceAll("n/a", "0.0")));
+                            stock.setChangePerc(priceChangePerc);
                             stock.setPeRatio(-1.0);
                             isUpdated = true;
                             // duration = System.currentTimeMillis() - startTime;

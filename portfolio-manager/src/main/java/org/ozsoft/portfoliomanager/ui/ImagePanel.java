@@ -59,7 +59,11 @@ public class ImagePanel extends JPanel {
 
         try {
             image = ImageIO.read(is);
-            setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
+            if (image != null) {
+                setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
+            } else {
+                setPreferredSize(new Dimension(100, 100));
+            }
         } finally {
             IOUtils.closeQuietly(is);
         }

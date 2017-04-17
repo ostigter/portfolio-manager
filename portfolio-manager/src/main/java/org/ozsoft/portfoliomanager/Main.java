@@ -40,7 +40,7 @@ public class Main {
 
         // Configuration config = Configuration.getInstance();
         // UpdateService updateService = new UpdateService();
-        // Stock stock = config.getStock("ROBO");
+        // Stock stock = config.getStock("V");
         // updateService.updatePrice(stock);
     }
 }
