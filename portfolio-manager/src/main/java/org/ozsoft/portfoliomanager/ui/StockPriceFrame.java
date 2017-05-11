@@ -46,7 +46,7 @@ public class StockPriceFrame extends JFrame {
 
     private static final long serialVersionUID = -7868161566551066062L;
 
-    private static final String PRICE_GRAPH_URI = "http://chart.finance.yahoo.com/z?s=%s&t=%s&q=l&l=off&z=m&p=v";
+    private static final String PRICE_GRAPH_URI = "https://chart.finance.yahoo.com/z?s=%s&t=%s&l=off&p=v";
 
     private final Stock stock;
 
@@ -157,8 +157,6 @@ public class StockPriceFrame extends JFrame {
         gbc.weighty = 0.0;
         gbc.insets = new Insets(10, 10, 10, 10);
         getContentPane().add(analyzeButton, gbc);
-
-        update();
     }
 
     /**
@@ -168,10 +166,10 @@ public class StockPriceFrame extends JFrame {
      *            The stock.
      */
     public static void show(Stock stock) {
-        JFrame frame = new StockPriceFrame(stock);
+        StockPriceFrame frame = new StockPriceFrame(stock);
         frame.setResizable(false);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+
+        frame.update();
     }
 
     /**
@@ -190,6 +188,9 @@ public class StockPriceFrame extends JFrame {
             sevenDaysGraphPanel.setImage(httpPageReader.downloadFile(String.format(PRICE_GRAPH_URI, symbol, "1d")));
 
             pack();
+            setLocationRelativeTo(null);
+
+            setVisible(true);
 
             repaint();
             revalidate();

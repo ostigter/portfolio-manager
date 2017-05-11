@@ -30,9 +30,9 @@ import org.ozsoft.portfoliomanager.util.HttpPageReader;
  */
 public class AnalyzeService {
 
-    private static final String HISTORICAL_PRICES_URL = "http://ichart.finance.yahoo.com/table.csv?s=%s";
+    private static final String HISTORICAL_PRICES_URL = "https://ichart.finance.yahoo.com/table.csv?s=%s";
 
-    private static final String HISTORICAL_DIVIDENDS_URL = "http://ichart.finance.yahoo.com/table.csv?s=%s&g=v";
+    private static final String HISTORICAL_DIVIDENDS_URL = "https://ichart.finance.yahoo.com/table.csv?s=%s&g=v";
 
     private static final DateFormat DATE_FORMAT_SHORT = new SimpleDateFormat("yyyy-MM-dd");
 
