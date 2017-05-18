@@ -343,7 +343,17 @@ public class Stock implements Comparable<Stock> {
     }
 
     /**
-     * Sets the current Morningstar value rating.
+     * Sets the current Morningstar value rating. <br />
+     * <br /
+     * 
+     * <ul>
+     * <li>1 = Extremely overvalued</li>
+     * <li>2 = Overvalued</li>
+     * <li>3 = Fair value</li>
+     * <li>4 = UndervaluedL</li>
+     * <li>5 = Extremely undervalued</li>
+     * <li>-1 = No rating</li>
+     * </ul>
      *
      * @param starRating
      *            The current Morningstar value rating.

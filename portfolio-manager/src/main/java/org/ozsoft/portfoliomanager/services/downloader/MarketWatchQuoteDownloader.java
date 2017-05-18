@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.ozsoft.portfoliomanager.domain.Exchange;
 import org.ozsoft.portfoliomanager.domain.Stock;
 import org.ozsoft.portfoliomanager.util.HttpPageReader;
 
@@ -96,7 +97,14 @@ public class MarketWatchQuoteDownloader extends QuoteDownloader {
                     // startTime = System.currentTimeMillis();
                     m = STOCK_PATTERN.matcher(content);
                     if (m.find()) {
-                        // String exchange = m.group(1);
+                        String exchange = m.group(1).toUpperCase();
+                        if (exchange.contains("NYSE")) {
+                            stock.setExchange(Exchange.NYSE);
+                        } else if (exchange.contains("NASDAQ")) {
+                            stock.setExchange(Exchange.NASDAQ);
+                        } else {
+                            stock.setExchange(Exchange.UNKNOWN);
+                        }
                         price = new BigDecimal(m.group(2));
                         priceChangePerc = Double.parseDouble(m.group(3).replaceAll("n/a", "0.0"));
                         peRatio = Double.parseDouble(m.group(4).replaceAll("n/a", "-1.0"));

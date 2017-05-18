@@ -99,13 +99,25 @@ public class StockUpdater extends Thread {
         // Get Morningstar value rating (if rated).
         try {
             int starRating = -1;
-            String exchangeId = (stock.getExchange() == Exchange.NYSE) ? "xnys" : "xnas";
-            String content = httpPageReader.read(String.format(MORNINGSTAR_QUOTE_URI, exchangeId, stock.getSymbol()));
-            Matcher m = MORNINGSTAR_QUOTE_PATTERN.matcher(content);
-            if (m.find()) {
-                starRating = Integer.parseInt(m.group(1));
+
+            String exchangeId = null;
+            if (stock.getExchange() == Exchange.NYSE) {
+                exchangeId = "xnys";
+            } else if (stock.getExchange() == Exchange.NASDAQ) {
+                exchangeId = "xnas";
             }
+
+            if (exchangeId != null) {
+                String content = httpPageReader.read(String.format(MORNINGSTAR_QUOTE_URI, exchangeId, stock.getSymbol()));
+                Matcher m = MORNINGSTAR_QUOTE_PATTERN.matcher(content);
+                if (m.find()) {
+                    starRating = Integer.parseInt(m.group(1));
+                }
+            }
+
             stock.setStarRating(starRating);
+            // LOGGER.debug(String.format("### Morningstar value rating for %s: %d", stock, starRating));
+
         } catch (IOException e) {
             LOGGER.error(String.format("Failed to retrieve Morningstar value rating for %s: %s", stock, e.getMessage()));
         }
