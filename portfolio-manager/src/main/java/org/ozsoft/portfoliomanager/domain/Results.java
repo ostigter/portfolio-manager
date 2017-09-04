@@ -1,8 +1,9 @@
 package org.ozsoft.portfoliomanager.domain;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.Calendar;
+
+import org.ozsoft.portfoliomanager.util.MathUtils;
 
 public class Results {
 
@@ -37,7 +38,7 @@ public class Results {
 
     public BigDecimal getAverageCosts() {
         if (noOfDays > 0) {
-            return costs.divide(new BigDecimal(noOfDays), MathContext.DECIMAL64);
+            return MathUtils.divide(costs, new BigDecimal(noOfDays));
         } else {
             return BigDecimal.ZERO;
         }

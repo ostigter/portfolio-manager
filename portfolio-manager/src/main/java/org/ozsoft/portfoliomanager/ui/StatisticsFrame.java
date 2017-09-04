@@ -167,7 +167,7 @@ public class StatisticsFrame extends JDialog {
                         sps = sharesPerStock.get(symbol);
                         BigDecimal avgPrice;
                         if (cps != null && sps != null && sps > 0) {
-                            avgPrice = cps.divide(new BigDecimal(sps), MathContext.DECIMAL64);
+                            avgPrice = MathUtils.divide(cps, new BigDecimal(sps));
                         } else {
                             throw new IllegalStateException(String.format("Invalid SELL transaction for stock '%s': non-existing position", symbol));
                         }
@@ -197,7 +197,7 @@ public class StatisticsFrame extends JDialog {
                     for (Integer dayNr : costPerDay.keySet()) {
                         sum = sum.add(costPerDay.get(dayNr));
                     }
-                    BigDecimal avgCost = sum.divide(new BigDecimal(daysInMonth), MathContext.DECIMAL64);
+                    BigDecimal avgCost = MathUtils.divide(sum, new BigDecimal(daysInMonth));
                     textArea.append(String.format("%sAverage Costbase: $%,.0f, Income: $%,.0f\n", formatPeriod(month, year), avgCost,
                             monthlyResult.getIncome()));
                     monthlyResult.clear();
@@ -239,11 +239,10 @@ public class StatisticsFrame extends JDialog {
         if (years < 1.0) {
             years = 1.0; // to not extrapolate CAGR for less than a year
         }
-        BigDecimal avgCost = sum.divide(new BigDecimal(totalDays), MathContext.DECIMAL64);
+        BigDecimal avgCost = MathUtils.divide(sum, new BigDecimal(totalDays));
         Portfolio portfolio = config.getPortfolio();
         BigDecimal totalReturn = portfolio.getTotalReturn();
-        double totalReturnCAGR = (Math.pow(totalReturn.divide(avgCost, MathContext.DECIMAL64).add(BigDecimal.ONE).doubleValue(), 1.0 / years) - 1.0)
-                * 100.0;
+        double totalReturnCAGR = (Math.pow(MathUtils.divide(totalReturn, avgCost).add(BigDecimal.ONE).doubleValue(), 1.0 / years) - 1.0) * 100.0;
         textArea.append(String.format("\nOverall:\t\tAverage Costbase: $%,.0f, Income: $%,.0f, Total Return: $%,.0f (%.2f %% CAGR)\n", avgCost,
                 portfolio.getTotalIncome(), totalReturn, totalReturnCAGR));
     }

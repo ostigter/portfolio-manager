@@ -139,7 +139,7 @@ public class Position implements Comparable<Position> {
     public BigDecimal getCostPerShare() {
         BigDecimal currentInvestment = getCurrentCost();
         if (currentInvestment.signum() > 0) {
-            return currentInvestment.divide(noOfShares, MathContext.DECIMAL64);
+            return MathUtils.divide(currentInvestment, noOfShares);
         } else {
             return BigDecimal.ZERO;
         }
@@ -200,8 +200,8 @@ public class Position implements Comparable<Position> {
                 if (tx.getNoOfShares().compareTo(noOfShares) > 0) {
                     throw new IllegalArgumentException("Cannot sell more shares than owned");
                 }
-                BigDecimal avgPrice = currentCost.divide(noOfShares, MathContext.DECIMAL64);
-                BigDecimal value = tx.getNoOfShares().multiply(avgPrice);
+                BigDecimal avgPrice = MathUtils.divide(currentCost, noOfShares);
+                BigDecimal value = tx.getNoOfShares().multiply(avgPrice, MathContext.DECIMAL64);
                 currentCost = currentCost.subtract(value);
                 if (currentCost.compareTo(MIN_COST) < 0) {
                     // Round very low cost down to 0 to avoid rounding errors.

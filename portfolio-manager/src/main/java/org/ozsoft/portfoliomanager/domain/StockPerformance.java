@@ -82,7 +82,7 @@ public class StockPerformance {
         change = endPrice.subtract(startPrice);
         changePerc = MathUtils.perc(change, startPrice);
         volatility = BigDecimal.ZERO;
-        BigDecimal slope = change.divide(new BigDecimal(count), MathContext.DECIMAL64);
+        BigDecimal slope = MathUtils.divide(change, new BigDecimal(count));
         for (int i = 0; i < count; i++) {
             BigDecimal p = prices.get(i).getValue();
             if (p.compareTo(lowPrice) < 0) {
@@ -92,9 +92,9 @@ public class StockPerformance {
                 highPrice = p;
             }
             BigDecimal avg = startPrice.add(new BigDecimal(i).multiply(slope));
-            volatility = volatility.add(MathUtils.abs(p, avg).divide(p, MathContext.DECIMAL64).multiply(MathUtils.HUNDRED));
+            volatility = volatility.add(MathUtils.divide(MathUtils.abs(p, avg), p).multiply(MathUtils.HUNDRED));
         }
-        volatility = volatility.divide(new BigDecimal(count), MathContext.DECIMAL64);
+        volatility = MathUtils.divide(volatility, new BigDecimal(count));
 
         // Determine actual duration based on the stock's history.
         Date firstDate = prices.get(0).getDate();
@@ -132,9 +132,9 @@ public class StockPerformance {
 
     public double getCagr() {
         if (years < 1.0) {
-            return endPrice.add(totalDividends).divide(startPrice, MathContext.DECIMAL64).doubleValue();
+            return MathUtils.divide(endPrice.add(totalDividends), startPrice).doubleValue();
         } else {
-            return (Math.pow(endPrice.add(totalDividends).divide(startPrice, MathContext.DECIMAL64).doubleValue(), 1.0 / years) - 1.0) * 100.0;
+            return (Math.pow(MathUtils.divide(endPrice.add(totalDividends), startPrice).doubleValue(), 1.0 / years) - 1.0) * 100.0;
         }
     }
 

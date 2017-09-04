@@ -9,6 +9,8 @@ public abstract class MathUtils {
 
     public static final BigDecimal HUNDRED = new BigDecimal(100);
 
+    public static final MathContext MATH_CONTEXT = MathContext.DECIMAL64;
+
     /**
      * Private constructor to deny instantation.
      */
@@ -17,8 +19,44 @@ public abstract class MathUtils {
     }
 
     /**
-     * Returns the percentage of one decimal value of another.
-     *
+     * Indicates whether a decimal value is exactly 0.
+     * 
+     * @param value
+     *            The value.
+     * 
+     * @return {@code true} if exactly 0, otherwise {@code false}.
+     */
+    public static boolean isZero(BigDecimal value) {
+        return value.compareTo(BigDecimal.ZERO) == 0;
+    }
+
+    /**
+     * Safely divides a decimal value with another. <br />
+     * <br />
+     * 
+     * If the divider is exactly 0, 0 is returned.
+     * 
+     * @param arg1
+     *            The first value.
+     * @param arg2
+     *            The second value.
+     * 
+     * @return The division.
+     */
+    public static BigDecimal divide(BigDecimal arg1, BigDecimal arg2) {
+        if (isZero(arg2)) {
+            return BigDecimal.ZERO;
+        } else {
+            return arg1.divide(arg2, MATH_CONTEXT);
+        }
+    }
+
+    /**
+     * Returns the percentage of one decimal value of another. <br />
+     * <br />
+     * 
+     * If the divider is exactly 0, 0 is returned.
+     * 
      * @param arg1
      *            First value.
      * @param arg2
@@ -27,15 +65,23 @@ public abstract class MathUtils {
      * @return The percentage.
      */
     public static BigDecimal perc(BigDecimal arg1, BigDecimal arg2) {
-        if (arg2.equals(BigDecimal.ZERO)) {
+        if (isZero(arg2)) {
             return BigDecimal.ZERO;
         } else {
-            return arg1.divide(arg2, MathContext.DECIMAL64).multiply(HUNDRED);
+            return arg1.divide(arg2, MATH_CONTEXT).multiply(HUNDRED);
         }
     }
 
+    /**
+     * Returns the negation of a decimal value.
+     * 
+     * @param value
+     *            The value.
+     * 
+     * @return The negated value.
+     */
     public static BigDecimal negate(BigDecimal value) {
-        return value.multiply(MINUS_ONE);
+        return value.multiply(MINUS_ONE, MATH_CONTEXT);
     }
 
     /**
@@ -45,10 +91,11 @@ public abstract class MathUtils {
      *            First value.
      * @param arg2
      *            Second value.
+     * 
      * @return The absolute distance.
      */
     public static BigDecimal abs(BigDecimal arg1, BigDecimal arg2) {
-        BigDecimal diff = arg1.subtract(arg2, MathContext.DECIMAL64);
-        return diff.abs(MathContext.DECIMAL64);
+        BigDecimal diff = arg1.subtract(arg2, MATH_CONTEXT);
+        return diff.abs(MATH_CONTEXT);
     }
 }
