@@ -33,15 +33,11 @@ public class Stock implements Comparable<Stock> {
 
     private String name;
 
-    private Exchange exchange = Exchange.UNKNOWN;
-
     private BigDecimal price = BigDecimal.ZERO;
 
     private long timestamp = -1L;
 
     private BigDecimal prevPrice = BigDecimal.ZERO;
-
-    private double peRatio = -1.0;
 
     private BigDecimal targetPrice = BigDecimal.ZERO;
 
@@ -52,8 +48,6 @@ public class Stock implements Comparable<Stock> {
     private int yearsDivGrowth = -1;
 
     private CreditRating creditRating = CreditRating.NA;
-
-    private int starRating = -1;
 
     private String comment;
 
@@ -101,25 +95,6 @@ public class Stock implements Comparable<Stock> {
     }
 
     /**
-     * Gets the stock exchange this stock is traded on.
-     *
-     * @return The stock exchange.
-     */
-    public Exchange getExchange() {
-        return exchange;
-    }
-
-    /**
-     * Sets the stock exchange this stock is traded on.
-     *
-     * @param exchange
-     *            The stock exchange.
-     */
-    public void setExchange(Exchange exchange) {
-        this.exchange = exchange;
-    }
-
-    /**
      * Returns the current price.
      *
      * @return The current price.
@@ -164,25 +139,6 @@ public class Stock implements Comparable<Stock> {
      */
     public BigDecimal getChangePerc() {
         return MathUtils.percChange(prevPrice, price);
-    }
-
-    /**
-     * Returns the trailing P/E (price/earnings) ratio.
-     *
-     * @return The trailing P/E ratio.
-     */
-    public double getPeRatio() {
-        return peRatio;
-    }
-
-    /**
-     * Sets the trailing P/E (price/earnings) ratio.
-     *
-     * @param peRatio
-     *            The P/E ratio.
-     */
-    public void setPeRatio(double peRatio) {
-        this.peRatio = peRatio;
     }
 
     /**
@@ -361,35 +317,6 @@ public class Stock implements Comparable<Stock> {
      */
     public void setCreditRating(CreditRating creditRating) {
         this.creditRating = creditRating;
-    }
-
-    /**
-     * Returns the current Morningstar value rating.
-     *
-     * @return The current Morningstar value rating.
-     */
-    public int getStarRating() {
-        return starRating;
-    }
-
-    /**
-     * Sets the current Morningstar value rating. <br />
-     * <br /
-     * 
-     * <ul>
-     * <li>1 = Extremely overvalued</li>
-     * <li>2 = Overvalued</li>
-     * <li>3 = Fair value</li>
-     * <li>4 = UndervaluedL</li>
-     * <li>5 = Extremely undervalued</li>
-     * <li>-1 = No rating</li>
-     * </ul>
-     *
-     * @param starRating
-     *            The current Morningstar value rating.
-     */
-    public void setStarRating(int starRating) {
-        this.starRating = starRating;
     }
 
     @Override

@@ -20,11 +20,8 @@ package org.ozsoft.portfoliomanager.services.downloader;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,8 +47,6 @@ public class GoogleFinanceQuoteDownloader extends QuoteDownloader {
     private static final String INTRADAY_PRICES_URL = "http://finance.google.com/finance/getprices?q=%s&p=%dd&i=60&f=d,c";
 
     private static final Logger LOGGER = LogManager.getLogger(GoogleFinanceQuoteDownloader.class);
-
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd-MMM-yyyy HH:mm", Locale.US);
 
     /**
      * Constructor.
