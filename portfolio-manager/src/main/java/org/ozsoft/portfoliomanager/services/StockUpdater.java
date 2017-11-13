@@ -18,15 +18,8 @@
 
 package org.ozsoft.portfoliomanager.services;
 
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.ozsoft.portfoliomanager.domain.Exchange;
 import org.ozsoft.portfoliomanager.domain.Stock;
-import org.ozsoft.portfoliomanager.services.downloader.MarketWatchQuoteDownloader;
+import org.ozsoft.portfoliomanager.services.downloader.GoogleFinanceQuoteDownloader;
 import org.ozsoft.portfoliomanager.services.downloader.QuoteDownloader;
 import org.ozsoft.portfoliomanager.util.HttpPageReader;
 
@@ -40,15 +33,7 @@ import org.ozsoft.portfoliomanager.util.HttpPageReader;
  */
 public class StockUpdater extends Thread {
 
-    private static final String MORNINGSTAR_QUOTE_URI = "http://www.morningstar.com/stocks/%s/%s/quote.html";
-
-    private static final Pattern MORNINGSTAR_QUOTE_PATTERN = Pattern.compile("\"starRating\":([0-9])");
-
-    private static final Logger LOGGER = LogManager.getLogger(StockUpdater.class);
-
     private final Stock stock;
-
-    private final HttpPageReader httpPageReader;
 
     private final QuoteDownloader downloader;
 
@@ -66,11 +51,9 @@ public class StockUpdater extends Thread {
      */
     public StockUpdater(Stock stock, HttpPageReader httpPageReader) {
         this.stock = stock;
-        this.httpPageReader = httpPageReader;
 
         // TODO: Automatic failover to other quote downloaders.
-        downloader = new MarketWatchQuoteDownloader(httpPageReader);
-        // downloader = new YahooFinanceQuoteDownloader(httpPageReader);
+        downloader = new GoogleFinanceQuoteDownloader(httpPageReader);
     }
 
     /**
@@ -93,35 +76,7 @@ public class StockUpdater extends Thread {
 
     @Override
     public void run() {
-        // Get stock quote.
         isUpdated = downloader.updateStock(stock);
-
-        // Get Morningstar value rating (if rated).
-        try {
-            int starRating = -1;
-
-            String exchangeId = null;
-            if (stock.getExchange() == Exchange.NYSE) {
-                exchangeId = "xnys";
-            } else if (stock.getExchange() == Exchange.NASDAQ) {
-                exchangeId = "xnas";
-            }
-
-            if (exchangeId != null) {
-                String content = httpPageReader.read(String.format(MORNINGSTAR_QUOTE_URI, exchangeId, stock.getSymbol()));
-                Matcher m = MORNINGSTAR_QUOTE_PATTERN.matcher(content);
-                if (m.find()) {
-                    starRating = Integer.parseInt(m.group(1));
-                }
-            }
-
-            stock.setStarRating(starRating);
-            // LOGGER.debug(String.format("### Morningstar value rating for %s: %d", stock, starRating));
-
-        } catch (IOException e) {
-            LOGGER.error(String.format("Failed to retrieve Morningstar value rating for %s: %s", stock, e.getMessage()));
-        }
-
         isFinished = true;
     }
 }

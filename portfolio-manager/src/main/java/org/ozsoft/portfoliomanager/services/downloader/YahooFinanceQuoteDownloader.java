@@ -36,7 +36,7 @@ import org.ozsoft.portfoliomanager.util.HttpPageReader;
  */
 public class YahooFinanceQuoteDownloader extends QuoteDownloader {
 
-    private static final String URI = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1p2r";
+    private static final String URI = "https://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1p2r";
 
     private static final Logger LOGGER = LogManager.getLogger(YahooFinanceQuoteDownloader.class);
 
@@ -64,10 +64,10 @@ public class YahooFinanceQuoteDownloader extends QuoteDownloader {
                     BigDecimal price = new BigDecimal(fields[0]);
                     if (!price.equals(stock.getPrice())) {
                         stock.setPrice(price);
-                        stock.setChangePerc(fields[2].equals("N/A") ? 0.0 : Double.parseDouble(fields[1].replaceAll("[\"%]", "")));
+                        // stock.setChangePerc(fields[2].equals("N/A") ? 0.0 : Double.parseDouble(fields[1].replaceAll("[\"%]", "")));
                         stock.setPeRatio(fields[2].equals("N/A") ? -1.0 : Double.parseDouble(fields[2]));
                         isUpdated = true;
-                        // LOGGER.debug("Updated stock price of " + stock);
+                        LOGGER.debug("Updated stock price of " + stock);
                     }
                 } catch (NumberFormatException e) {
                     LOGGER.error(String.format("Could not parse stock quote for %s: '%s'", stock, line), e);

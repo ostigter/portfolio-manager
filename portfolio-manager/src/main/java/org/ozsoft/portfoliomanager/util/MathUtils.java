@@ -27,7 +27,7 @@ public abstract class MathUtils {
      * @return {@code true} if exactly 0, otherwise {@code false}.
      */
     public static boolean isZero(BigDecimal value) {
-        return value.compareTo(BigDecimal.ZERO) == 0;
+        return value == null || value.compareTo(BigDecimal.ZERO) == 0;
     }
 
     /**
@@ -69,6 +69,24 @@ public abstract class MathUtils {
             return BigDecimal.ZERO;
         } else {
             return arg1.divide(arg2, MATH_CONTEXT).multiply(HUNDRED);
+        }
+    }
+
+    /**
+     * Returns the percentage change between two values.
+     * 
+     * @param oldValue
+     *            The old value.
+     * @param newValue
+     *            The new value.
+     * 
+     * @return The percentage change.
+     */
+    public static BigDecimal percChange(BigDecimal oldValue, BigDecimal newValue) {
+        if (isZero(oldValue) || isZero(newValue)) {
+            return BigDecimal.ZERO;
+        } else {
+            return newValue.subtract(oldValue).divide(oldValue, MATH_CONTEXT).multiply(HUNDRED);
         }
     }
 

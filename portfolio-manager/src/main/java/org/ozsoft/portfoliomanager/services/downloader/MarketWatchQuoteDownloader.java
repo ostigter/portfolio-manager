@@ -39,12 +39,10 @@ import org.ozsoft.portfoliomanager.util.HttpPageReader;
  */
 public class MarketWatchQuoteDownloader extends QuoteDownloader {
 
-    // private static final String URI = "http://www.marketwatch.com/m/quote/%s";
-    private static final String URI = "http://www.marketwatch.com/investing/stock/%s";
+    private static final String URI = "https://www.marketwatch.com/investing/stock/%s";
 
     private static final Pattern TYPE_PATTERN = Pattern.compile("<meta name=\"instrumentType\" content=\"(.*?)\">");
 
-    // TODO: Support after-hours and pre-market prices
     // TODO: Retrieve dividend rate from MarketWatch iso CCC list
     private static final Pattern STOCK_PATTERN = Pattern.compile(
             "<meta name=\"exchange\" content=\"(.*?)\">.*<meta name=\"price\" content=\"(.*?)\">.*<meta name=\"priceChangePercent\" content=\"(.*?)%\">.*<small class=\"kv__label\">P/E Ratio</small>\\s*<span class=\"kv__value kv__primary .*?\">(.*?)</span>",
@@ -127,7 +125,7 @@ public class MarketWatchQuoteDownloader extends QuoteDownloader {
 
                         if (!price.equals(stock.getPrice())) {
                             stock.setPrice(price);
-                            stock.setChangePerc(priceChangePerc);
+                            // stock.setChangePerc(priceChangePerc);
                             stock.setPeRatio(peRatio);
                             isUpdated = true;
                             // duration = System.currentTimeMillis() - startTime;
@@ -166,7 +164,7 @@ public class MarketWatchQuoteDownloader extends QuoteDownloader {
 
                         if (!price.equals(stock.getPrice())) {
                             stock.setPrice(price);
-                            stock.setChangePerc(priceChangePerc);
+                            // stock.setChangePerc(priceChangePerc);
                             stock.setPeRatio(-1.0);
                             isUpdated = true;
                             // duration = System.currentTimeMillis() - startTime;

@@ -37,7 +37,9 @@ public class Stock implements Comparable<Stock> {
 
     private BigDecimal price = BigDecimal.ZERO;
 
-    private double changePerc;
+    private long timestamp = -1L;
+
+    private BigDecimal prevPrice = BigDecimal.ZERO;
 
     private double peRatio = -1.0;
 
@@ -137,22 +139,31 @@ public class Stock implements Comparable<Stock> {
     }
 
     /**
+     * Returns the previous closing price.
+     * 
+     * @return The previous closing price.
+     */
+    public BigDecimal getPrevPrice() {
+        return prevPrice;
+    }
+
+    /**
+     * Sets the previous closing price.
+     * 
+     * @param prevPrice
+     *            The previous closing price.
+     */
+    public void setPrevPrice(BigDecimal prevPrice) {
+        this.prevPrice = prevPrice;
+    }
+
+    /**
      * Returns the current price change percentage based on the previous closing price.
      *
      * @return The price change percentage.
      */
-    public double getChangePerc() {
-        return changePerc;
-    }
-
-    /**
-     * Sets the current price change percentage based on the previous closing price.
-     *
-     * @param changePerc
-     *            The price change percentage.
-     */
-    public void setChangePerc(double changePerc) {
-        this.changePerc = changePerc;
+    public BigDecimal getChangePerc() {
+        return MathUtils.percChange(prevPrice, price);
     }
 
     /**
@@ -172,6 +183,25 @@ public class Stock implements Comparable<Stock> {
      */
     public void setPeRatio(double peRatio) {
         this.peRatio = peRatio;
+    }
+
+    /**
+     * Returns the timestamp of the last update.
+     * 
+     * @return The timestamp.
+     */
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * Sets the timestamp of the last update.
+     * 
+     * @param timestamp
+     *            The timestamp.
+     */
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     /*

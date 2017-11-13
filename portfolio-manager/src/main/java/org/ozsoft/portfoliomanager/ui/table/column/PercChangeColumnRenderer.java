@@ -47,7 +47,8 @@ public class PercChangeColumnRenderer extends DefaultColumnRenderer {
                 return String.format("%+.2f %%", percValue);
             } else {
                 // Empty value when no change.
-                return null;
+                textColor = Color.BLACK;
+                return "0.00 %";
             }
         } else if (value instanceof Double) {
             double percValue = (double) value;
@@ -59,7 +60,8 @@ public class PercChangeColumnRenderer extends DefaultColumnRenderer {
                 return String.format("%+.2f %%", (double) value);
             } else {
                 // Empty value when no change.
-                return null;
+                textColor = Color.BLACK;
+                return "0.00 %";
             }
         } else {
             // Empty value, e.g. in footer row.
