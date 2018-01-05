@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.ozsoft.portfoliomanager.util.MathUtils;
+import org.ozsoft.stockbase.Quote;
 
 /**
  * Stock performance during a specific time range.
@@ -54,11 +55,11 @@ public class StockPerformance {
 
     private double years;
 
-    public StockPerformance(List<ClosingPrice> allPrices, List<ClosingPrice> dividends, TimeRange dateFilter) {
+    public StockPerformance(List<Quote> allPrices, List<Quote> dividends, TimeRange dateFilter) {
         // Find closing prices during specified period.
-        List<ClosingPrice> prices = new ArrayList<ClosingPrice>();
+        List<Quote> prices = new ArrayList<Quote>();
         Date fromDate = dateFilter.getFromDate();
-        for (ClosingPrice price : allPrices) {
+        for (Quote price : allPrices) {
             if (price.getDate().after(fromDate)) {
                 prices.add(price);
             }
@@ -67,16 +68,16 @@ public class StockPerformance {
 
         // Calculate total amount of received dividend payments during period.
         totalDividends = BigDecimal.ZERO;
-        for (ClosingPrice payment : dividends) {
+        for (Quote payment : dividends) {
             if (payment.getDate().after(fromDate)) {
-                totalDividends = totalDividends.add(payment.getValue());
+                totalDividends = totalDividends.add(payment.getPrice());
             }
         }
 
         // Calculate price statisics.
         int count = prices.size();
-        startPrice = prices.get(0).getValue();
-        endPrice = prices.get(count - 1).getValue();
+        startPrice = prices.get(0).getPrice();
+        endPrice = prices.get(count - 1).getPrice();
         lowPrice = new BigDecimal(99999);
         highPrice = BigDecimal.ZERO;
         change = endPrice.subtract(startPrice);
@@ -84,7 +85,7 @@ public class StockPerformance {
         volatility = BigDecimal.ZERO;
         BigDecimal slope = MathUtils.divide(change, new BigDecimal(count));
         for (int i = 0; i < count; i++) {
-            BigDecimal p = prices.get(i).getValue();
+            BigDecimal p = prices.get(i).getPrice();
             if (p.compareTo(lowPrice) < 0) {
                 lowPrice = p;
             }

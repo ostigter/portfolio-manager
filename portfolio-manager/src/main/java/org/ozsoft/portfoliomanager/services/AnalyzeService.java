@@ -4,24 +4,19 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.ozsoft.portfoliomanager.domain.ClosingPrice;
 import org.ozsoft.portfoliomanager.domain.Configuration;
 import org.ozsoft.portfoliomanager.domain.Stock;
 import org.ozsoft.portfoliomanager.domain.StockAnalysis;
 import org.ozsoft.portfoliomanager.domain.StockPerformance;
 import org.ozsoft.portfoliomanager.domain.TimeRange;
-import org.ozsoft.portfoliomanager.util.HttpPageReader;
+import org.ozsoft.stockbase.Quote;
+import org.ozsoft.stockbase.StockBase;
 
 /**
  * Service for analyzing stocks.
@@ -30,21 +25,12 @@ import org.ozsoft.portfoliomanager.util.HttpPageReader;
  */
 public class AnalyzeService {
 
-    private static final String HISTORICAL_PRICES_URL = "https://ichart.finance.yahoo.com/table.csv?s=%s";
-
-    private static final String HISTORICAL_DIVIDENDS_URL = "https://ichart.finance.yahoo.com/table.csv?s=%s&g=v";
-
-    private static final DateFormat DATE_FORMAT_SHORT = new SimpleDateFormat("yyyy-MM-dd");
-
     private static final Logger LOGGER = LogManager.getLogger(UpdateService.class);
 
     private final Configuration config;
 
-    private final HttpPageReader httpPageReader;
-
     public AnalyzeService() {
         config = Configuration.getInstance();
-        httpPageReader = new HttpPageReader();
     }
 
     /**
@@ -57,8 +43,21 @@ public class AnalyzeService {
     public StockAnalysis analyzeStock(Stock stock) {
         LOGGER.debug(String.format("Analyzing %s", stock));
 
-        List<ClosingPrice> prices = getClosingPrices(stock);
-        List<ClosingPrice> dividends = getDividends(stock);
+        // Get all historical closing prices.
+        List<Quote> prices = null;
+        try {
+            prices = StockBase.getHistoricPrices(stock.getSymbol());
+        } catch (IOException e) {
+            LOGGER.error("Could not retrieve historic closing prices for " + stock, e);
+        }
+
+        // Get all historical dividend payments.
+        List<Quote> dividends = null;
+        try {
+            dividends = StockBase.getHistoricDividends(stock.getSymbol());
+        } catch (IOException e) {
+            LOGGER.error("Could not retrieve historic closing prices for " + stock, e);
+        }
 
         StockPerformance perf10yr = new StockPerformance(prices, dividends, TimeRange.TEN_YEAR);
         StockPerformance perf5yr = new StockPerformance(prices, dividends, TimeRange.FIVE_YEAR);
@@ -109,79 +108,79 @@ public class AnalyzeService {
         return resultMessage;
     }
 
-    /**
-     * Retrieves the historic closing prices for a stock.
-     *
-     * @param stock
-     *            The stock.
-     * @return The historic closing prices.
-     */
-    private List<ClosingPrice> getClosingPrices(Stock stock) {
-        String symbol = stock.getSymbol();
-        String uri = String.format(HISTORICAL_PRICES_URL, symbol);
-        List<ClosingPrice> prices = new ArrayList<ClosingPrice>();
-        boolean inHeader = true;
-        try {
-            String response = httpPageReader.read(uri);
-            for (String line : response.split("\n")) {
-                if (inHeader) {
-                    inHeader = false;
-                } else {
-                    String[] fields = line.split(",");
-                    if (fields.length == 7) {
-                        try {
-                            Date date = DATE_FORMAT_SHORT.parse(fields[0]);
-                            BigDecimal value = new BigDecimal(fields[6]);
-                            prices.add(new ClosingPrice(date, value));
-                        } catch (ParseException e) {
-                            LOGGER.error(String.format("Could not parse price quote: '%s'", line), e);
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.error(String.format("Could retrieve historical prices for '%s'", symbol), e);
-        }
-
-        return prices;
-    }
-
-    /**
-     * Retrieves the historic dividends of a stock.
-     *
-     * @param stock
-     *            The stock.
-     *
-     * @return The historic dividends.
-     */
-    public List<ClosingPrice> getDividends(Stock stock) {
-        String symbol = stock.getSymbol();
-        String uri = String.format(HISTORICAL_DIVIDENDS_URL, symbol);
-        List<ClosingPrice> prices = new ArrayList<ClosingPrice>();
-        boolean inHeader = true;
-        try {
-            String response = httpPageReader.read(uri);
-            for (String line : response.split("\n")) {
-                if (inHeader) {
-                    inHeader = false;
-                } else {
-                    String[] fields = line.split(",");
-                    if (fields.length == 2) {
-                        try {
-                            Date date = DATE_FORMAT_SHORT.parse(fields[0]);
-                            BigDecimal value = new BigDecimal(fields[1]);
-                            prices.add(new ClosingPrice(date, value));
-                        } catch (ParseException e) {
-                            LOGGER.error(String.format("Could not parse price quote: '%s'", line));
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.error(String.format("Could retrieve historical dividend payments for '%s': %s", symbol, e.getMessage()));
-            e.printStackTrace(System.err);
-        }
-
-        return prices;
-    }
+    // /**
+    // * Retrieves the historic closing prices for a stock.
+    // *
+    // * @param stock
+    // * The stock.
+    // * @return The historic closing prices.
+    // */
+    // private List<Quote> getQuotes(Stock stock) {
+    // String symbol = stock.getSymbol();
+    // String uri = String.format(HISTORICAL_PRICES_URL, symbol);
+    // List<Quote> prices = new ArrayList<Quote>();
+    // boolean inHeader = true;
+    // try {
+    // String response = httpPageReader.read(uri);
+    // for (String line : response.split("\n")) {
+    // if (inHeader) {
+    // inHeader = false;
+    // } else {
+    // String[] fields = line.split(",");
+    // if (fields.length == 7) {
+    // try {
+    // Date date = DATE_FORMAT_SHORT.parse(fields[0]);
+    // BigDecimal value = new BigDecimal(fields[6]);
+    // prices.add(new Quote(date, value));
+    // } catch (ParseException e) {
+    // LOGGER.error(String.format("Could not parse price quote: '%s'", line), e);
+    // }
+    // }
+    // }
+    // }
+    // } catch (IOException e) {
+    // LOGGER.error(String.format("Could retrieve historical prices for '%s'", symbol), e);
+    // }
+    //
+    // return prices;
+    // }
+    //
+    // /**
+    // * Retrieves the historic dividends of a stock.
+    // *
+    // * @param stock
+    // * The stock.
+    // *
+    // * @return The historic dividends.
+    // */
+    // public List<Quote> getDividends(Stock stock) {
+    // String symbol = stock.getSymbol();
+    // String uri = String.format(HISTORICAL_DIVIDENDS_URL, symbol);
+    // List<Quote> prices = new ArrayList<Quote>();
+    // boolean inHeader = true;
+    // try {
+    // String response = httpPageReader.read(uri);
+    // for (String line : response.split("\n")) {
+    // if (inHeader) {
+    // inHeader = false;
+    // } else {
+    // String[] fields = line.split(",");
+    // if (fields.length == 2) {
+    // try {
+    // Date date = DATE_FORMAT_SHORT.parse(fields[0]);
+    // BigDecimal value = new BigDecimal(fields[1]);
+    // prices.add(new Quote(date, value));
+    // } catch (ParseException e) {
+    // LOGGER.error(String.format("Could not parse price quote: '%s'", line));
+    // }
+    // }
+    // }
+    // }
+    // } catch (IOException e) {
+    // LOGGER.error(String.format("Could retrieve historical dividend payments for '%s': %s", symbol, e.getMessage()));
+    // e.printStackTrace(System.err);
+    // }
+    //
+    // return prices;
+    // }
 }
