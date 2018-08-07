@@ -35,9 +35,7 @@ public class Stock implements Comparable<Stock> {
 
     private BigDecimal price = BigDecimal.ZERO;
 
-    private long timestamp = -1L;
-
-    private BigDecimal prevPrice = BigDecimal.ZERO;
+    private BigDecimal changePerc = BigDecimal.ZERO;
 
     private BigDecimal targetPrice = BigDecimal.ZERO;
 
@@ -57,9 +55,9 @@ public class Stock implements Comparable<Stock> {
      * Constructor.
      *
      * @param symbol
-     *            Ticket symbol (e.g. "MSFT").
+     *                   Ticket symbol (e.g. "MSFT").
      * @param name
-     *            Name (e.g. "Microsoft").
+     *                   Name (e.g. "Microsoft").
      */
     public Stock(String symbol, String name) {
         this.symbol = symbol;
@@ -88,7 +86,7 @@ public class Stock implements Comparable<Stock> {
      * Sets the name.
      *
      * @param name
-     *            The name.
+     *                 The name.
      */
     public void setName(String name) {
         this.name = name;
@@ -107,29 +105,10 @@ public class Stock implements Comparable<Stock> {
      * Sets the current price.
      *
      * @param price
-     *            The current price.
+     *                  The current price.
      */
     public void setPrice(BigDecimal price) {
         this.price = price;
-    }
-
-    /**
-     * Returns the previous closing price.
-     * 
-     * @return The previous closing price.
-     */
-    public BigDecimal getPrevPrice() {
-        return prevPrice;
-    }
-
-    /**
-     * Sets the previous closing price.
-     * 
-     * @param prevPrice
-     *            The previous closing price.
-     */
-    public void setPrevPrice(BigDecimal prevPrice) {
-        this.prevPrice = prevPrice;
     }
 
     /**
@@ -138,26 +117,17 @@ public class Stock implements Comparable<Stock> {
      * @return The price change percentage.
      */
     public BigDecimal getChangePerc() {
-        return MathUtils.percChange(prevPrice, price);
+        return changePerc;
     }
 
     /**
-     * Returns the timestamp of the last update.
-     * 
-     * @return The timestamp.
+     * Sets the price change in percentage.
+     *
+     * @param changePerc
+     *                       The price change in percentage.
      */
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    /**
-     * Sets the timestamp of the last update.
-     * 
-     * @param timestamp
-     *            The timestamp.
-     */
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setChangePerc(BigDecimal changePerc) {
+        this.changePerc = changePerc;
     }
 
     /*
@@ -173,7 +143,7 @@ public class Stock implements Comparable<Stock> {
      * Sets he target price.
      *
      * @param targetPrice
-     *            The target price.
+     *                        The target price.
      */
     public void setTargetPrice(BigDecimal targetPrice) {
         this.targetPrice = targetPrice;
@@ -201,7 +171,7 @@ public class Stock implements Comparable<Stock> {
      * Sets the current, annual dividend rate per share.
      *
      * @param divRate
-     *            The dividend rate.
+     *                    The dividend rate.
      */
     public void setDivRate(BigDecimal divRate) {
         this.divRate = divRate;
@@ -237,7 +207,7 @@ public class Stock implements Comparable<Stock> {
      * Sets the comment.
      *
      * @param comment
-     *            The comment, or {@code null} to clear.
+     *                    The comment, or {@code null} to clear.
      */
     public void setComment(String comment) {
         this.comment = comment;
@@ -256,7 +226,7 @@ public class Stock implements Comparable<Stock> {
      * Sets the 'stock level'.
      *
      * @param level
-     *            The 'stock level'.
+     *                  The 'stock level'.
      */
     public void setLevel(StockLevel level) {
         this.level = level;
@@ -275,7 +245,7 @@ public class Stock implements Comparable<Stock> {
      * Sets the number of consecutive years of dividend growth.
      *
      * @param yearsDivGrowth
-     *            The number of consecutive years of dividend growth.
+     *                           The number of consecutive years of dividend growth.
      */
     public void setYearsDivGrowth(int yearsDivGrowth) {
         this.yearsDivGrowth = yearsDivGrowth;
@@ -294,7 +264,7 @@ public class Stock implements Comparable<Stock> {
      * Sets the 5-year compounded annual dividend growth rate.
      *
      * @param divGrowth
-     *            The 5-year compounded annual dividend growth rate.
+     *                      The 5-year compounded annual dividend growth rate.
      */
     public void setDivGrowth(BigDecimal divGrowth) {
         this.divGrowth = divGrowth;
@@ -313,7 +283,7 @@ public class Stock implements Comparable<Stock> {
      * Sets the credit rating.
      *
      * @param creditRating
-     *            The credit rating.
+     *                         The credit rating.
      */
     public void setCreditRating(CreditRating creditRating) {
         this.creditRating = creditRating;

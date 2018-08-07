@@ -38,15 +38,16 @@ public class Main {
             }
         });
 
-        // Stock stock = Configuration.getInstance().getStock("BGS");
-        // new UpdateService().updatePrice(stock);
-        // StockAnalysis analysis = new AnalyzeService().analyzeStock(stock);
-        // System.out.format("Stock: %s\n", stock);
-        // System.out.format("Credit rating: %s\n", stock.getCreditRating().getText());
-        // System.out.format("Years DGR: %d\n", stock.getYearsDivGrowth());
-        // System.out.format("10-yr CAGR: %,.2f %%\n", analysis.getCagr10yr());
-        // System.out.format(" 5-yr CAGR: %,.2f %%\n", analysis.getCagr5yr());
-        // System.out.format("Current yield: %,.2f %%\n", stock.getYield());
-        // System.out.format("5-yr DGR: %,.2f %%\n", stock.getDivGrowth());
+//		Stock stock = Configuration.getInstance().getStock("AAPL");
+//		new UpdateService().updatePrice(stock);
+
+//		StockAnalysis analysis = new AnalyzeService().analyzeStock(stock);
+//		System.out.format("Stock: %s\n", stock);
+//		System.out.format("Credit rating: %s\n", stock.getCreditRating().getText());
+//		System.out.format("Years DGR: %d\n", stock.getYearsDivGrowth());
+//		System.out.format("10-yr CAGR: %,.2f %%\n", analysis.getCagr10yr());
+//		System.out.format(" 5-yr CAGR: %,.2f %%\n", analysis.getCagr5yr());
+//		System.out.format("Current yield: %,.2f %%\n", stock.getYield());
+//		System.out.format("5-yr DGR: %,.2f %%\n", stock.getDivGrowth());
     }
 }

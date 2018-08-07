@@ -11,16 +11,15 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ozsoft.portfoliomanager.domain.Configuration;
+import org.ozsoft.portfoliomanager.domain.Quote;
 import org.ozsoft.portfoliomanager.domain.Stock;
 import org.ozsoft.portfoliomanager.domain.StockAnalysis;
 import org.ozsoft.portfoliomanager.domain.StockPerformance;
 import org.ozsoft.portfoliomanager.domain.TimeRange;
-import org.ozsoft.stockbase.Quote;
-import org.ozsoft.stockbase.StockBase;
 
 /**
  * Service for analyzing stocks.
- * 
+ *
  * @author Oscar Stigter
  */
 public class AnalyzeService {
@@ -37,7 +36,7 @@ public class AnalyzeService {
      * Analyzes a stock based on its historic performance and current valuation (price only).
      *
      * @param stock
-     *            The stock to analyze.
+     *                  The stock to analyze.
      * @return The stock analysis result.
      */
     public StockAnalysis analyzeStock(Stock stock) {
@@ -45,19 +44,19 @@ public class AnalyzeService {
 
         // Get all historical closing prices.
         List<Quote> prices = null;
-        try {
-            prices = StockBase.getHistoricPrices(stock.getSymbol());
-        } catch (IOException e) {
-            LOGGER.error("Could not retrieve historic closing prices for " + stock, e);
-        }
+//		try {
+//			prices = StockBase.getHistoricPrices(stock.getSymbol());
+//		} catch (IOException e) {
+//			LOGGER.error("Could not retrieve historic closing prices for " + stock, e);
+//		}
 
         // Get all historical dividend payments.
         List<Quote> dividends = null;
-        try {
-            dividends = StockBase.getHistoricDividends(stock.getSymbol());
-        } catch (IOException e) {
-            LOGGER.error("Could not retrieve historic closing prices for " + stock, e);
-        }
+//		try {
+//			dividends = StockBase.getHistoricDividends(stock.getSymbol());
+//		} catch (IOException e) {
+//			LOGGER.error("Could not retrieve historic closing prices for " + stock, e);
+//		}
 
         StockPerformance perf10yr = new StockPerformance(prices, dividends, TimeRange.TEN_YEAR);
         StockPerformance perf5yr = new StockPerformance(prices, dividends, TimeRange.FIVE_YEAR);
@@ -139,7 +138,8 @@ public class AnalyzeService {
     // }
     // }
     // } catch (IOException e) {
-    // LOGGER.error(String.format("Could retrieve historical prices for '%s'", symbol), e);
+    // LOGGER.error(String.format("Could retrieve historical prices for '%s'",
+    // symbol), e);
     // }
     //
     // return prices;
@@ -177,7 +177,8 @@ public class AnalyzeService {
     // }
     // }
     // } catch (IOException e) {
-    // LOGGER.error(String.format("Could retrieve historical dividend payments for '%s': %s", symbol, e.getMessage()));
+    // LOGGER.error(String.format("Could retrieve historical dividend payments for
+    // '%s': %s", symbol, e.getMessage()));
     // e.printStackTrace(System.err);
     // }
     //

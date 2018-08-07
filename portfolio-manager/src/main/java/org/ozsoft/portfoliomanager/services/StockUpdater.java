@@ -19,16 +19,16 @@
 package org.ozsoft.portfoliomanager.services;
 
 import org.ozsoft.portfoliomanager.domain.Stock;
-import org.ozsoft.portfoliomanager.services.downloader.GoogleFinanceQuoteDownloader;
 import org.ozsoft.portfoliomanager.services.downloader.QuoteDownloader;
+import org.ozsoft.portfoliomanager.services.downloader.YahooFinanceQuoteDownloader;
 import org.ozsoft.portfoliomanager.util.HttpPageReader;
 
 /**
  * Thread that updates a single stock. <br />
  * <br />
- * 
+ *
  * Gets the current stock quote from the MarketWatch and Morningstar's value rating.
- * 
+ *
  * @author Oscar Stigter
  */
 public class StockUpdater extends Thread {
@@ -43,22 +43,22 @@ public class StockUpdater extends Thread {
 
     /**
      * Constructor.
-     * 
+     *
      * @param stock
-     *            The stock.
+     *                           The stock.
      * @param httpPageReader
-     *            The {@link HttpPageReader} (possibly shared).
+     *                           The {@link HttpPageReader} (possibly shared).
      */
     public StockUpdater(Stock stock, HttpPageReader httpPageReader) {
         this.stock = stock;
 
         // TODO: Automatic failover to other quote downloaders.
-        downloader = new GoogleFinanceQuoteDownloader(httpPageReader);
+        downloader = new YahooFinanceQuoteDownloader();
     }
 
     /**
      * Returns wheher the update operation has finished.
-     * 
+     *
      * @return {@code true} if finished, otherwise {@code false}.
      */
     public boolean isFinished() {
@@ -67,7 +67,7 @@ public class StockUpdater extends Thread {
 
     /**
      * Returns whether the stock was updated (based on it's current price).
-     * 
+     *
      * @return {@code true} if updated, otherwise {@code false}.
      */
     public boolean isUpdated() {

@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.ozsoft.portfoliomanager.util.MathUtils;
-import org.ozsoft.stockbase.Quote;
 
 /**
  * Stock performance during a specific time range.

@@ -75,7 +75,7 @@ public class UpdateService {
      */
     public int updateAllStockData() {
         // LOGGER.debug("Updating all stock data");
-        updateStatistics();
+//        updateStatistics();
         return updateAllPrices();
     }
 
@@ -83,7 +83,8 @@ public class UpdateService {
      * Updates the price of a single stock.
      *
      * @param stock
-     *            The stock to update.
+     *                  The stock to update.
+     * 
      * @return True if the stock was updated (price changed), otherwise false.
      */
     public boolean updatePrice(Stock stock) {
@@ -158,7 +159,7 @@ public class UpdateService {
      * Downloads the latest version of David Fish' CCC list (Excel sheet).
      *
      * @param file
-     *            The local CCC list file.
+     *                 The local CCC list file.
      */
     private void downloadCCCList(File file) {
         LOGGER.debug("Downloading latest version of the CCC list");
@@ -195,7 +196,8 @@ public class UpdateService {
      * network I/O burst).
      *
      * @param stocks
-     *            The stocks to update.
+     *                   The stocks to update.
+     *
      * @return The number of updated stocks.
      */
     public int updatePrices(Set<Stock> stocks) {
