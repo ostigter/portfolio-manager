@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Portfolio Manager is a desktop application to track stocks and manage your portfolio, especially designed for value and dividend growth investing styles based on the U.S. market.
+Portfolio Manager is a desktop application to track stocks and manage your portfolio, especially designed for value and dividend (growth) investing styles based on the U.S. market.
 
-Real-time and historic stock prices and dividends are retrieved from MarketWatch or Yahoo Finance, while other stock data is retrieved from David Fish' CCC list and Morningstar.
+Real-time and historic stock prices are retrieved from Yahoo Finance, while other stock data has to be entered manually.
 
 ## Features
 
