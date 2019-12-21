@@ -1,8 +1,7 @@
 Portfolio Manager - TODO
 ========================
 
-* Retrieve current dividend rate from MarketWatch iso CCC list
-* Retrieve dividend growth data from Yahoo Finance iso CCC list
+* Stock price graphs
 * Portfolio result graphs
 * View application log
 * Configuration dialog

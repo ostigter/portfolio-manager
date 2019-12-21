@@ -33,7 +33,7 @@ import org.apache.commons.io.IOUtils;
 
 /**
  * Retrieves HTTP pages from an URL, with support for a HTTP proxy with optional authentication.
- * 
+ *
  * @author Oscar Stigter
  */
 public class HttpPageReader {
@@ -77,10 +77,10 @@ public class HttpPageReader {
 
     /**
      * Reads an HTTP page from an URL.
-     * 
+     *
      * @param uri
-     *            The URL.
-     * 
+     *                The URL.
+     *
      * @return The response content body.
      */
     public String read(String uri) throws IOException {
@@ -95,14 +95,14 @@ public class HttpPageReader {
 
     /**
      * Retrieves the last modified date of a remote file (if set) over HTTP.
-     * 
+     *
      * @param uri
-     *            The URI of the remote file.
-     * 
+     *                The URI of the remote file.
+     *
      * @return The last modified date if found, otherwise -1L.
-     * 
+     *
      * @throws IOException
-     *             If the remote file could not be found, or the last modified date could not be determined.
+     *                         If the remote file could not be found, or the last modified date could not be determined.
      */
     public long getFileLastModified(String uri) throws IOException {
         long timestamp = -1L;
@@ -137,14 +137,14 @@ public class HttpPageReader {
 
     /**
      * Retrieves (downloads) a remote file over HTTP.
-     * 
+     *
      * @param uri
-     *            The URI of the remote file.
-     * 
+     *                The URI of the remote file.
+     *
      * @return The file contents.
-     * 
+     *
      * @throws IOException
-     *             If the file could not be found or retrieved.
+     *                         If the file could not be found or retrieved.
      */
     public InputStream downloadFile(String uri) throws IOException {
         updateProxySettings();
@@ -168,7 +168,7 @@ public class HttpPageReader {
 
     /**
      * Simple HTTP authenticator with a username and password.
-     * 
+     *
      * @author Oscar Stigter
      */
     private static class SimpleAuthenticator extends Authenticator {

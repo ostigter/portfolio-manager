@@ -75,7 +75,7 @@ public class OwnedTable extends DataTable {
      * Constructor.
      *
      * @param mainFrame
-     *            The application's main window.
+     *                      The application's main window.
      */
     public OwnedTable(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -179,10 +179,11 @@ public class OwnedTable extends DataTable {
         // Populate table with portfolio positions (owned stocks).
         Portfolio portfolio = config.getPortfolio();
         BigDecimal currentPortfolioCost = portfolio.getCurrentCost();
+        BigDecimal currentPortfolioValue = portfolio.getCurrentValue();
         for (Position p : portfolio.getPositions()) {
             if (p.getNoOfShares().intValue() > 0 || showClosedPositions) {
                 Stock s = p.getStock();
-                BigDecimal weight = MathUtils.perc(p.getCurrentCost(), currentPortfolioCost);
+                BigDecimal weight = MathUtils.perc(p.getCurrentValue(), currentPortfolioValue);
                 addRow(s.getName(), s.getSymbol(), s.getPrice(), s.getChangePerc(), s.getYield(), s.getDivGrowth().doubleValue(),
                         s.getYearsDivGrowth(), s.getCreditRating(), p.getNoOfShares().intValue(), p.getCurrentCost(), p.getCostPerShare(),
                         p.getCurrentValue(), weight, p.getCurrentResult(), p.getCurrentResultPercentage(), p.getAnnualIncome(), p.getYieldOnCost(),

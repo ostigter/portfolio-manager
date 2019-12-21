@@ -50,17 +50,25 @@ import org.ozsoft.portfoliomanager.util.HttpPageReader;
  */
 public class UpdateService {
 
-    private static final String CCC_LIST_URI = "http://www.dripinvesting.org/Tools/U.S.DividendChampions.xls";
+    private static final String CCC_LIST_URI = "https://www.dripinvesting.org/Tools/U.S.DividendChampions.xlsx";
 
     private static final String SHEET_NAME = "All CCC";
 
+    private static final int HEADER_ROWS = 5;
+
     private static final int SYMBOL_COLUMN_INDEX = CellReference.convertColStringToIndex("B");
 
-    private static final int YEARS_GROWTH_COLUMN_INDEX = CellReference.convertColStringToIndex("D");
+    private static final int YEARS_GROWTH_COLUMN_INDEX = CellReference.convertColStringToIndex("E");
 
-    private static final int DIV_RATE_COLUMN_INDEX = CellReference.convertColStringToIndex("R");
+    private static final int DIV_RATE_COLUMN_INDEX = CellReference.convertColStringToIndex("M");
 
-    private static final int DIV_GROWTH_COLUMN_INDEX = CellReference.convertColStringToIndex("AN");
+    private static final int DIV_GROWTH_1Y_COLUMN_INDEX = CellReference.convertColStringToIndex("S");
+
+    private static final int DIV_GROWTH_3Y_COLUMN_INDEX = CellReference.convertColStringToIndex("T");
+
+    private static final int DIV_GROWTH_5Y_COLUMN_INDEX = CellReference.convertColStringToIndex("U");
+
+    private static final BigDecimal MINUS_ONE = new BigDecimal("-1.0");
 
     private static final Logger LOGGER = LogManager.getLogger(UpdateService.class);
 
@@ -74,8 +82,7 @@ public class UpdateService {
      * @return The number of updated stocks.
      */
     public int updateAllStockData() {
-        // LOGGER.debug("Updating all stock data");
-//        updateStatistics();
+        updateStatistics();
         return updateAllPrices();
     }
 
@@ -84,7 +91,7 @@ public class UpdateService {
      *
      * @param stock
      *                  The stock to update.
-     * 
+     *
      * @return True if the stock was updated (price changed), otherwise false.
      */
     public boolean updatePrice(Stock stock) {
@@ -114,27 +121,33 @@ public class UpdateService {
     private void updateStatistics() {
         // Download CCC list if missing or newer available
         File cccListFile = config.getCCCListFile();
-        long localTimestamp = (cccListFile.exists()) ? cccListFile.lastModified() : -1L;
+        long localTimestamp = (cccListFile.exists()) ? cccListFile.lastModified() : 0L;
         try {
             long remoteTimestamp = httpPageReader.getFileLastModified(CCC_LIST_URI);
             if (remoteTimestamp > localTimestamp) {
                 downloadCCCList(cccListFile);
             }
+
             // Update stock statistics from CCC list
             try {
                 Workbook workbook = WorkbookFactory.create(cccListFile);
                 Sheet sheet = workbook.getSheet(SHEET_NAME);
                 int count = 0;
                 for (Row row : sheet) {
-                    if (row.getRowNum() > 5) {
+                    if (row.getRowNum() > HEADER_ROWS) {
                         Cell cell = row.getCell(SYMBOL_COLUMN_INDEX);
                         if (cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING) {
                             String symbol = cell.getStringCellValue();
                             int yearsDivGrowth = (int) Math.floor(row.getCell(YEARS_GROWTH_COLUMN_INDEX).getNumericCellValue());
-                            BigDecimal divRate = new BigDecimal(row.getCell(DIV_RATE_COLUMN_INDEX).toString());
-                            cell = row.getCell(DIV_GROWTH_COLUMN_INDEX);
-                            BigDecimal divGrowth = (cell != null && cell.getCellType() == Cell.CELL_TYPE_NUMERIC) ? new BigDecimal(cell.toString())
-                                    : new BigDecimal("-1.0");
+                            BigDecimal divRate = getExcelCellValue(row.getCell(DIV_RATE_COLUMN_INDEX)).setScale(2, BigDecimal.ROUND_HALF_UP);
+                            BigDecimal divGrowth = getExcelCellValue(row.getCell(DIV_GROWTH_5Y_COLUMN_INDEX));
+                            if (divGrowth == MINUS_ONE) {
+                                divGrowth = getExcelCellValue(row.getCell(DIV_GROWTH_3Y_COLUMN_INDEX));
+                                if (divGrowth == MINUS_ONE) {
+                                    divGrowth = getExcelCellValue(row.getCell(DIV_GROWTH_1Y_COLUMN_INDEX));
+                                }
+                            }
+                            divGrowth = divGrowth.setScale(2, BigDecimal.ROUND_HALF_UP);
                             Stock stock = config.getStock(symbol);
                             if (stock != null) {
                                 stock.setYearsDivGrowth(yearsDivGrowth);
@@ -153,6 +166,30 @@ public class UpdateService {
         } catch (IOException e) {
             LOGGER.error("Failed to download CCC list", e);
         }
+    }
+
+    /**
+     * Returns the numerical value of an Excel sheet cell, or -1.0 if not a valid number (e.g. "n/a").
+     *
+     * @param cell
+     *                 The cell.
+     *
+     * @return The numerical value.
+     */
+    private static BigDecimal getExcelCellValue(Cell cell) {
+        BigDecimal value = MINUS_ONE;
+
+        if (cell != null) {
+            try {
+                if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC || cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
+                    return new BigDecimal(cell.getNumericCellValue());
+                }
+            } catch (Exception e) {
+                // Interpret as "n/a"
+            }
+        }
+
+        return value;
     }
 
     /**

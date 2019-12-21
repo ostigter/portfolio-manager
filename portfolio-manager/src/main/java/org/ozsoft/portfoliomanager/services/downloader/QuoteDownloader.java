@@ -18,12 +18,15 @@
 
 package org.ozsoft.portfoliomanager.services.downloader;
 
+import java.util.List;
+
+import org.ozsoft.portfoliomanager.domain.Quote;
 import org.ozsoft.portfoliomanager.domain.Stock;
 import org.ozsoft.portfoliomanager.util.HttpPageReader;
 
 /**
  * Abstract base class for all quote downloaders.
- * 
+ *
  * @author Oscar Stigter
  */
 public abstract class QuoteDownloader {
@@ -32,9 +35,9 @@ public abstract class QuoteDownloader {
 
     /**
      * Constructor.
-     * 
+     *
      * @param httpPageReader
-     *            The HTTP page reader.
+     *                           The HTTP page reader.
      */
     public QuoteDownloader(HttpPageReader httpPageReader) {
         this.httpPageReader = httpPageReader;
@@ -43,13 +46,33 @@ public abstract class QuoteDownloader {
     /**
      * Updates a stock. <br />
      * <br />
-     * 
+     *
      * A stock is considered updated if the price has changed.
-     * 
+     *
      * @param stock
-     *            The stock.
-     * 
+     *                  The stock.
+     *
      * @return {@code true} if the stock was updated, otherwise {@code false}.
      */
     public abstract boolean updateStock(Stock stock);
+
+    /**
+     * Retrieves a stock's historic closing prices.
+     *
+     * @param stock
+     *                  The stock.
+     *
+     * @return The stock's historic closing prices.
+     */
+    public abstract List<Quote> getHistoricPrices(Stock stock);
+
+    /**
+     * Returns all of a stock's dividend payouts.
+     *
+     * @param symbol
+     *                   The stock's symbol.
+     *
+     * @return The stock's dividend payouts.
+     */
+    public abstract List<Quote> getDividendPayouts(Stock stock);
 }
